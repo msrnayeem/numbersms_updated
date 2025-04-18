@@ -3,31 +3,19 @@ block main %}
 <!-- banner area -->
 <section class="pt-[50px] pb-[100px] bg-bg">
   <div class="container flex flex-col items-center justify-center">
-    <div
-      data-aos="fade-up"
-      class="flex items-center gap-2 rounded-full bg-white text-dark px-2 py-[8px] w-fit"
-    >
-      <div
-        class="bg-primary bg-opacity-10 rounded-full w-[20px] h-[20px] flex items-center justify-center"
-      >
+    <div data-aos="fade-up" class="flex items-center gap-2 rounded-full bg-white text-dark px-2 py-[8px] w-fit">
+      <div class="bg-primary bg-opacity-10 rounded-full w-[20px] h-[20px] flex items-center justify-center">
         <i class="ri-gemini-fill text-primary"></i>
       </div>
-      <span class="text-sm text-dark font-normal"
-        >{{ "{:,}".format(total_services.get('data')) }}+ Service
-        Available</span
-      >
+      <span class="text-sm text-dark font-normal">{{ "{:,}".format(total_services.get('data')) }}+ Service
+        Available</span>
     </div>
-    <h1
-      data-aos="fade-up"
-      class="w-full md:w-[75%] text-center font-bold text-4xl leading-[47px] md:text-6xl md:selection:leading-[67px] text-dark mt-1"
-    >
+    <h1 data-aos="fade-up"
+      class="w-full md:w-[75%] text-center font-bold text-4xl leading-[47px] md:text-6xl md:selection:leading-[67px] text-dark mt-1">
       Keep your number <span class="text-secondary">private</span> with our
       service.
     </h1>
-    <p
-      data-aos="fade-up"
-      class="w-full md:w-[70%] text-center text-base text-gray-600 mt-4"
-    >
+    <p data-aos="fade-up" class="w-full md:w-[70%] text-center text-base text-gray-600 mt-4">
       Keep your personal number private while staying connected. Enjoy seamless
       communication without compromising privacy. Trusted by thousands for
       secure and convenient service.
@@ -36,26 +24,20 @@ block main %}
     <button data-aos="fade-up" class="mt-6">
       {%if auth_data.get('auth') == True %} {%if auth_data.get('role') == 'user'
       %}
-      <a
-        href="{{url_for('user.dashboard')}}"
-        class="py-2 px-4 rounded-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium"
-        >Go App
-        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i
-      ></a>
+      <a href="{{url_for('user.dashboard')}}"
+        class="py-2 px-4 rounded-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium">Go
+        App
+        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i></a>
       {%else%}
-      <a
-        href="{{url_for('admin.dashboard')}}"
-        class="py-2 px-4 rounded-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium"
-        >Go Admin
-        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i
-      ></a>
+      <a href="{{url_for('admin.dashboard')}}"
+        class="py-2 px-4 rounded-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium">Go
+        Admin
+        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i></a>
       {%endif%} {%else%}
-      <a
-        href="{{url_for('landing.signin')}}"
-        class="py-2 px-4 rounded-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium"
-        >get started
-        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i
-      ></a>
+      <a href="{{url_for('landing.signin')}}"
+        class="py-2 px-4 rounded-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium">get
+        started
+        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i></a>
       {%endif%}
     </button>
   </div>
@@ -66,42 +48,23 @@ block main %}
 <section class="py-[100px]">
   <div class="container">
     <div class="flex flex-col items-center justify-center gap-y-2">
-      <p
-        class="text-primary font-semibold text-center text-sm uppercase"
-        data-aos="fade-up"
-      >
+      <p class="text-primary font-semibold text-center text-sm uppercase" data-aos="fade-up">
         Our Process
       </p>
-      <h1
-        data-aos="fade-up"
-        class="text-3xl font-semibold text-dark text-center"
-      >
+      <h1 data-aos="fade-up" class="text-3xl font-semibold text-dark text-center">
         Let's See How it Works
       </h1>
-      <p
-        data-aos="fade-up"
-        class="text-center text-base text-gray-600 mt-2 w-full md:w-[50%] mx-auto"
-      >
+      <p data-aos="fade-up" class="text-center text-base text-gray-600 mt-2 w-full md:w-[50%] mx-auto">
         A brief summary of how our service works to keep your number private
         while staying connected.
       </p>
     </div>
 
-    <div
-      class="w-full md:w-[80%] lg:w-[70%] mx-auto grid grid-cols-1 md:grid-cols-3 mt-20 gap-10"
-    >
-      <div
-        class="flex flex-col items-center gap-y-3 relative"
-        data-aos="zoom-in"
-      >
-        <img
-          src="{{url_for('static', filename='media/right-arrow.png')}}"
-          class="absolute h-auto w-[100px] right-[-20px] top-[-50px] hidden md:block"
-        />
-        <img
-          src="{{url_for('static', filename='media/number-one.png')}}"
-          class="w-[30px] h-auto"
-        />
+    <div class="w-full md:w-[80%] lg:w-[70%] mx-auto grid grid-cols-1 md:grid-cols-3 mt-20 gap-10">
+      <div class="flex flex-col items-center gap-y-3 relative" data-aos="zoom-in">
+        <img src="{{url_for('static', filename='media/right-arrow.png')}}"
+          class="absolute h-auto w-[100px] right-[-20px] top-[-50px] hidden md:block" />
+        <img src="{{url_for('static', filename='media/number-one.png')}}" class="w-[30px] h-auto" />
         <div class="w-[calc(100%-30px)]">
           <p class="text-gray-400 text-sm font-semibold text-center">STEP</p>
           <h1 class="text-lg font-bold text-dark text-center">
@@ -114,18 +77,10 @@ block main %}
         </div>
       </div>
 
-      <div
-        class="flex flex-col items-center gap-y-3 relative"
-        data-aos="zoom-in"
-      >
-        <img
-          src="{{url_for('static', filename='media/right-arrow-bttom.png')}}"
-          class="absolute h-auto w-[100px] right-[-50px] bottom-[-50px] hidden md:block"
-        />
-        <img
-          src="{{url_for('static', filename='media/number-tow.png')}}"
-          class="w-[30px] h-auto"
-        />
+      <div class="flex flex-col items-center gap-y-3 relative" data-aos="zoom-in">
+        <img src="{{url_for('static', filename='media/right-arrow-bttom.png')}}"
+          class="absolute h-auto w-[100px] right-[-50px] bottom-[-50px] hidden md:block" />
+        <img src="{{url_for('static', filename='media/number-tow.png')}}" class="w-[30px] h-auto" />
         <div class="w-[calc(100%-30px)]">
           <p class="text-gray-400 text-sm font-semibold text-center">STEP</p>
           <h1 class="text-lg font-bold text-dark text-center">
@@ -138,10 +93,7 @@ block main %}
       </div>
 
       <div class="flex flex-col items-center gap-y-3" data-aos="zoom-in">
-        <img
-          src="{{url_for('static', filename='media/numbre-theree.png')}}"
-          class="w-[30px] h-auto"
-        />
+        <img src="{{url_for('static', filename='media/numbre-theree.png')}}" class="w-[30px] h-auto" />
         <div class="w-[calc(100%-30px)]">
           <p class="text-gray-400 text-sm font-semibold text-center">STEP</p>
           <h1 class="text-lg font-bold text-dark text-center">Get OTP</h1>
@@ -157,17 +109,10 @@ block main %}
 
 <!-- get-start -->
 <section class="py-[100px] bg-primary relative overflow-hidden z-[1]">
-  <img
-    src="{{url_for('static', filename='media/getstartbg.svg')}}"
-    class="absolute inset-0 min-w-full min-h-full object-cover z-[-1] opacity-20"
-  />
-  <div
-    class="container flex flex-col items-center justify-center w-full md:w-[60%] mx-auto z-[5]"
-  >
-    <h1
-      data-aos="fade-up"
-      class="text-white font-semibold text-4xl text-center"
-    >
+  <img src="{{url_for('static', filename='media/getstartbg.svg')}}"
+    class="absolute inset-0 min-w-full min-h-full object-cover z-[-1] opacity-20" />
+  <div class="container flex flex-col items-center justify-center w-full md:w-[60%] mx-auto z-[5]">
+    <h1 data-aos="fade-up" class="text-white font-semibold text-4xl text-center">
       Get started today
     </h1>
     <p data-aos="fade-up" class="text-white text-sm text-center mt-3">
@@ -178,26 +123,20 @@ block main %}
     <button data-aos="fade-up" class="mt-6">
       {%if auth_data.get('auth') == True %} {%if auth_data.get('role') == 'user'
       %}
-      <a
-        href="{{url_for('user.dashboard')}}"
-        class="py-2 px-4 rounded-full group bg-white shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-dark text-sm capitalize font-medium"
-        >Open App
-        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i
-      ></a>
+      <a href="{{url_for('user.dashboard')}}"
+        class="py-2 px-4 rounded-full group bg-white shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-dark text-sm capitalize font-medium">Open
+        App
+        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i></a>
       {%else%}
-      <a
-        href="{{url_for('admin.dashboard')}}"
-        class="py-2 px-4 rounded-full group bg-white shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-dark text-sm capitalize font-medium"
-        >Open Admin
-        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i
-      ></a>
+      <a href="{{url_for('admin.dashboard')}}"
+        class="py-2 px-4 rounded-full group bg-white shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-dark text-sm capitalize font-medium">Open
+        Admin
+        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i></a>
       {%endif%} {%else%}
-      <a
-        href="{{url_for('landing.signin')}}"
-        class="py-2 px-4 rounded-full group bg-white shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-dark text-sm capitalize font-medium"
-        >Open app
-        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i
-      ></a>
+      <a href="{{url_for('landing.signin')}}"
+        class="py-2 px-4 rounded-full group bg-white shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-dark text-sm capitalize font-medium">Open
+        app
+        <i class="ri-arrow-drop-right-line duration-500 group-hover:pl-2"></i></a>
       {%endif%}
     </button>
   </div>
@@ -208,30 +147,20 @@ block main %}
 <section class="py-[100px]">
   <div class="container">
     <div class="flex flex-col items-center justify-center gap-y-2">
-      <p
-        class="text-primary font-semibold text-center text-sm uppercase"
-        data-aos="fade-up"
-      >
+      <p class="text-primary font-semibold text-center text-sm uppercase" data-aos="fade-up">
         Our Price
       </p>
-      <h1
-        data-aos="fade-up"
-        class="text-3xl font-semibold text-dark text-center"
-      >
+      <h1 data-aos="fade-up" class="text-3xl font-semibold text-dark text-center">
         Our Pricing Plans
       </h1>
-      <p
-        data-aos="fade-up"
-        class="text-center text-base text-gray-600 mt-2 w-full md:w-[50%] mx-auto"
-      >
+      <p data-aos="fade-up" class="text-center text-base text-gray-600 mt-2 w-full md:w-[50%] mx-auto">
         A brief summary of our pricing plans for keeping your number private
         while staying connected.
       </p>
     </div>
 
     <div
-      class="bg-bg w-full md:w-[600px] mx-auto overflow-hidden rounded-lg p-2 mt-14 flex flex-col sm:flex-row items-center"
-    >
+      class="bg-bg w-full md:w-[600px] mx-auto overflow-hidden rounded-lg p-2 mt-14 flex flex-col sm:flex-row items-center">
       <div class="w-full sm:w-1/2 p-3">
         <p data-aos="fade-up" class="text-sm text-dark mb-5 font-normal">
           Pause or cancel at anytime
@@ -239,48 +168,32 @@ block main %}
         <ul class="space-y-2">
           <li data-aos="fade-up" class="flex items-center">
             <i
-              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"
-            ></i>
-            <span class="ml-2 text-sm text-dark"
-              >Get a Non-VoIP US phone number</span
-            >
+              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"></i>
+            <span class="ml-2 text-sm text-dark">Get a Non-VoIP US phone number</span>
           </li>
           <li data-aos="fade-up" class="flex items-center">
             <i
-              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"
-            ></i>
-            <span class="ml-2 text-sm text-dark"
-              >Register for any online service</span
-            >
+              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"></i>
+            <span class="ml-2 text-sm text-dark">Register for any online service</span>
           </li>
           <li data-aos="fade-up" class="flex items-center">
             <i
-              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"
-            ></i>
-            <span class="ml-2 text-sm text-dark"
-              >Short-term phone number reuse</span
-            >
+              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"></i>
+            <span class="ml-2 text-sm text-dark">Short-term phone number reuse</span>
           </li>
           <li data-aos="fade-up" class="flex items-center">
             <i
-              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"
-            ></i>
-            <span class="ml-2 text-sm text-dark"
-              >Receive SMS verification codes</span
-            >
+              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"></i>
+            <span class="ml-2 text-sm text-dark">Receive SMS verification codes</span>
           </li>
           <li data-aos="fade-up" class="flex items-center">
             <i
-              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"
-            ></i>
-            <span class="ml-2 text-sm text-dark"
-              >Respond to voice call verifications</span
-            >
+              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"></i>
+            <span class="ml-2 text-sm text-dark">Respond to voice call verifications</span>
           </li>
           <li data-aos="fade-up" class="flex items-center">
             <i
-              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"
-            ></i>
+              class="ri-check-line w-[12px] h-[12px] text-[10px] rounded-full bg-primary text-white flex items-center justify-center"></i>
             <span class="ml-2 text-sm text-dark">Choose a US area code</span>
           </li>
         </ul>
@@ -298,10 +211,8 @@ block main %}
           $0.25/<sub><span class="text-lg text-gray-500">Starting</span></sub>
         </h2>
         <a href="{{url_for('landing.signup')}}">
-          <button
-            data-aos="fade-up"
-            class="py-2 px-4 mt-5 rounded-full w-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium"
-          >
+          <button data-aos="fade-up"
+            class="py-2 px-4 mt-5 rounded-full w-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium">
             Buy now
           </button>
         </a>
@@ -313,28 +224,17 @@ block main %}
 
 <!-- testimonial -->
 <section class="py-[100px] relative z-[1] bg-bg/40">
-  <img
-    src="{{url_for('static', filename='media/testimonialbg.svg')}}"
-    class="absolute bottom-0 left-0 z-[-1] opacity-60 pointer-events-none"
-  />
+  <img src="{{url_for('static', filename='media/testimonialbg.svg')}}"
+    class="absolute bottom-0 left-0 z-[-1] opacity-60 pointer-events-none" />
   <div class="container">
     <div class="flex flex-col items-center justify-center gap-y-2">
-      <p
-        class="text-primary font-semibold text-center text-sm uppercase"
-        data-aos="fade-up"
-      >
+      <p class="text-primary font-semibold text-center text-sm uppercase" data-aos="fade-up">
         CAPTION HERE
       </p>
-      <h1
-        data-aos="fade-up"
-        class="text-3xl font-semibold text-dark text-center"
-      >
+      <h1 data-aos="fade-up" class="text-3xl font-semibold text-dark text-center">
         Testimonials
       </h1>
-      <p
-        data-aos="fade-up"
-        class="text-center text-base text-gray-600 mt-2 w-full md:w-[50%] mx-auto"
-      >
+      <p data-aos="fade-up" class="text-center text-base text-gray-600 mt-2 w-full md:w-[50%] mx-auto">
         Hear from our satisfied customers who have successfully kept their
         numbers private and stayed connected with our service.
       </p>
@@ -344,20 +244,15 @@ block main %}
       <div class="swiper-wrapper">
         {%if data.get('status') =='success' %} {% for user in data.get('data',
         []) %}
-        <div
-          class="swiper-slide flex flex-col items-center justify-center gap-2"
-        >
-          <i
-            data-aos="zoom-in"
-            class="ri-double-quotes-r w-[50px] h-[50px] text-2xl bg-primary bg-opacity-10 flex items-center justify-center text-primary rounded-full mx-auto mb-5"
-          ></i>
+        <div class="swiper-slide flex flex-col items-center justify-center gap-2">
+          <i data-aos="zoom-in"
+            class="ri-double-quotes-r w-[50px] h-[50px] text-2xl bg-primary bg-opacity-10 flex items-center justify-center text-primary rounded-full mx-auto mb-5"></i>
 
           <ul data-aos="fade-up" class="flex items-center justify-center gap-1">
             {% for i in range(1, 6) %}
             <li>
               <i
-                class="{% if i <= user.get('rating', 0) %}ri-star-s-fill{% else %}ri-star-s-line{% endif %} text-lg text-yellow-400"
-              ></i>
+                class="{% if i <= user.get('rating', 0) %}ri-star-s-fill{% else %}ri-star-s-line{% endif %} text-lg text-yellow-400"></i>
             </li>
             {% endfor %}
           </ul>
@@ -368,10 +263,7 @@ block main %}
             <h1 class="text-dark text-2xl font-semibold" data-aos="fade-up">
               {{user.get('user_name')}}
             </h1>
-            <p
-              class="text-gray-400 text-sm font-normal text-center"
-              data-aos="fade-up"
-            >
+            <p class="text-gray-400 text-sm font-normal text-center" data-aos="fade-up">
               {{user.get('ocopation')}}
             </p>
           </div>
@@ -381,14 +273,10 @@ block main %}
     </div>
 
     <div class="flex items-center gap-2 justify-center mt-6" data-aos="zoom-in">
-      <div
-        class="slider-next w-[100px] h-[40px] bg-gray-100 rounded-full flex items-center justify-center"
-      >
+      <div class="slider-next w-[100px] h-[40px] bg-gray-100 rounded-full flex items-center justify-center">
         <i class="ri-arrow-left-long-line"></i>
       </div>
-      <div
-        class="slider-prev w-[100px] h-[40px] bg-gray-100 rounded-full flex items-center justify-center"
-      >
+      <div class="slider-prev w-[100px] h-[40px] bg-gray-100 rounded-full flex items-center justify-center">
         <i class="ri-arrow-right-long-line"></i>
       </div>
     </div>

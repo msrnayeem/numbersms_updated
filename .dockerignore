@@ -1,0 +1,56 @@
+# General patterns
+.git/
+.gitignore
+*.swp
+*.swo
+.idea/
+.vscode/
+*.log
+
+# Python-specific patterns
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+
+# Node.js-specific patterns
+node_modules/
+npm-debug.log
+yarn-debug.log
+
+# Environment and secrets
+.env*
+*.pem
+*.key
+*.crt
+
+# Build and temporary files
+dist/
+build/
+out/
+tmp/
+temp/
+*.tmp
+
+# Documentation
+*.md
+README*
+
+# Docker files
+Dockerfile*
+docker-compose*
+
+# Project-specific patterns
+static/media/uploads/
+config.local.*
+*.local.yml
+
+# Exclude specific files or directories
+!static/css/
+!static/js/
+!templates/
+
+# Ensure no unintended exclusions
+!.dockerignore
+!requirements.txt
