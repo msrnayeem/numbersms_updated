@@ -1,0 +1,44 @@
+{% extends "layout.html" %} {%block title%}Blocked{%endblock%} {% block body %}
+<section class="bg-bg w-full h-screen overflow-hidden relative z-[1]">
+  <div
+    class="container flex flex-col gap-3 items-center justify-center h-screen"
+  >
+    <img
+      data-aos="zoom-in"
+      src="{{url_for('static', filename='media/error-404.png')}}"
+      class="w-[120px] h-auto"
+    />
+    <h1
+      data-aos="fade-up"
+      class="text-4xl font-bold text-primary w-full md:w-[450px] text-center"
+    >
+      You are blocked from admin.
+    </h1>
+    <p data-aos="fade-up" class="text-gray-500 text-sm font-normal">
+      Please contact the admin to discuss why you have been blocked.
+    </p>
+
+    <div class="flex items-center gap-x-3">
+      <a
+        href="{{url_for('landing.contact')}}"
+        data-aos="fade-up"
+        class="py-2 px-4 mt-3 rounded-full w-fit group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium"
+      >
+        <i class="ri-arrow-left-line"></i> Notify admin
+      </a>
+      <a
+        href="{{url_for('landing.logout')}}"
+        data-aos="fade-up"
+        class="py-2 px-4 mt-3 rounded-full w-fit group bg-red-500 shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium"
+      >
+        <i class="ri-shut-down-line"></i>
+        Logout</a
+      >
+    </div>
+  </div>
+  <img
+    src="{{url_for('static', filename='media/404.svg')}}"
+    class="absolute w-full h-full object-cover inset-0 opacity-5 z-[-1]"
+  />
+</section>
+{%endblock%}

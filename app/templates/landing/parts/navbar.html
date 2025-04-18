@@ -1,0 +1,162 @@
+<header
+  class="h-[80px] md:h-[100px] flex items-center justify-center bg-bg duration-300 w-full z-[800]"
+  id="navbar"
+  data-aos="fade-down"
+>
+  <div class="container flex items-center justify-between">
+    {%include 'partials/logo.dark.html'%}
+
+    <!-- menu -->
+    <ul class="hidden items-center gap-6 md:flex">
+      <li>
+        <a
+          href="/"
+          class="text-base text-dark {%if request.endpoint == 'landing.dashboard'%} font-semibold{%endif%} duration-300 hover:font-semibold"
+          >Home</a
+        >
+      </li>
+      <li>
+        <a
+          href="{{url_for('landing.about')}}"
+          class="text-base text-dark {%if request.endpoint == 'landing.about'%} font-semibold{%endif%} duration-300 hover:font-semibold"
+          >About</a
+        >
+      </li>
+      <li>
+        <a
+          href="{{url_for('landing.contact')}}"
+          class="text-base text-dark {%if request.endpoint == 'landing.contact'%} font-semibold{%endif%} duration-300 hover:font-semibold"
+          >Contact</a
+        >
+      </li>
+      {%if auth_data.get('auth') != True %}
+      <li>
+        <a
+          href="{{url_for('landing.signin')}}"
+          class="text-base text-dark {%if request.endpoint == 'landing.signin'%} font-semibold{%endif%} duration-300 hover:font-semibold"
+          >Login</a
+        >
+      </li>
+      {%endif%}
+    </ul>
+
+    <ul class="hidden md:flex items-center gap-6">
+      <li>
+        {%if auth_data.get('auth') == True %} {%if auth_data.get('role') ==
+        'user' %}
+        <a
+          href="{{url_for('user.dashboard')}}"
+          class="py-2 px-4 rounded-full flex gap-1 items-center bg-dark shadow-md shadow-secondary duration-200 hover:bg-opacity-90 text-white text-sm capitalize font-medium"
+        >
+          App <i class="ri-arrow-right-line"></i
+        ></a>
+        {% else %}
+        <a
+          href="{{url_for('admin.dashboard')}}"
+          class="py-2 px-4 rounded-full flex gap-1 items-center bg-dark shadow-md shadow-secondary duration-200 hover:bg-opacity-90 text-white text-sm capitalize font-medium"
+        >
+          Dashboard <i class="ri-arrow-right-line"></i>
+        </a>
+        {%endif%} {%else%}
+        <a
+          href="{{url_for('landing.signin')}}"
+          class="py-2 px-4 rounded-full flex gap-1 items-center bg-dark shadow-md shadow-secondary duration-200 hover:bg-opacity-90 text-white text-sm capitalize font-medium"
+        >
+          Signup free <i class="ri-arrow-right-line"></i>
+        </a>
+        {%endif%}
+      </li>
+    </ul>
+
+    <!-- toggler -->
+    <button
+      class="w-[45px] h-[45px] flex md:hidden items-center justify-center bg-gray-50 rounded-md"
+      id="mobileMenuToggler"
+    >
+      <i class="ri-menu-fill text-2xl text-dark"></i>
+    </button>
+
+    <!-- mobile menu -->
+    <div
+      id="mobileMenu"
+      class="fixed bg-dark bg-opacity-40 backdrop-blur-sm inset-0 w-full h-screen duration-100 pointer-events-none opacity-0"
+    >
+      <ul
+        class="flex flex-col items-start gap-6 bg-white w-[80%] md:w-[300px] h-screen p-6 duration-300 translate-x-[-100%]"
+      >
+        <li>
+          <a href="/" class="flex items-center gap-x-2">
+            <img
+              src="{{url_for('static', filename='media/logo.png')}}"
+              class="w-[35px] h-auto object-cover"
+            />
+            <div class="flex flex-col justify-center gap-0">
+              <p
+                class="text-dark font-bold text-[16px] uppercase h-[18px] flex items-center"
+              >
+                Number
+              </p>
+              <p
+                class="text-dark font-bold text-[16px] uppercase h-[18px] flex items-center"
+              >
+                sms
+              </p>
+            </div>
+          </a>
+        </li>
+        <li class="mt-5">
+          <a
+            href="/"
+            class="text-base text-dark {%if request.endpoint == 'landing.dashboard'%} font-semibold{%endif%} duration-300 hover:font-semibold"
+            >Home</a
+          >
+        </li>
+        <li>
+          <a
+            href="{{url_for('landing.about')}}"
+            class="text-base text-dark font-medium {%if request.endpoint == 'landing.about'%} font-semibold{%endif%} duration-300 hover:font-semibold"
+            >About</a
+          >
+        </li>
+        <li>
+          <a
+            href="{{url_for('landing.contact')}}"
+            class="text-base text-dark font-medium {%if request.endpoint == 'landing.contact'%} font-semibold{%endif%} duration-300 hover:font-semibold"
+            >Contact</a
+          >
+        </li>
+        {%if auth_data.get('auth') != True %}
+        <li>
+          <a
+            href="{{url_for('landing.signin')}}"
+            class="text-base text-dark font-medium {%if request.endpoint == 'landing.signin'%} font-semibold{%endif%} duration-300 hover:font-semibold"
+            >Login</a
+          >
+        </li>
+        {%endif%}
+        <li class="absolute left-6 bottom-6">
+          {%if auth_data.get('auth') == True %} {%if auth_data.get('role') ==
+          'user' %}
+          <a
+            href="{{url_for('user.dashboard')}}"
+            class="py-2 px-4 rounded-full flex items-center gap-1 bg-dark text-white text-sm capitalize font-medium"
+            >Go App <i class="ri-arrow-right-line"></i
+          ></a>
+          {% elif auth_data.get('role') == 'admin' %}
+          <a
+            href="{{url_for('admin.dashboard')}}"
+            class="py-2 px-4 rounded-full flex items-center gap-1 bg-dark text-white text-sm capitalize font-medium"
+            >Go Admin <i class="ri-arrow-right-line"></i
+          ></a>
+          {%else%}
+          <a
+            href="{{url_for('landing.signin')}}"
+            class="py-2 px-4 rounded-full flex items-center gap-1 bg-dark text-white text-sm capitalize font-medium"
+            >Sign up for free <i class="ri-arrow-right-line"></i
+          ></a>
+          {%endif%}{%endif%}
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>

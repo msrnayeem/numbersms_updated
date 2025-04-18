@@ -1,0 +1,49 @@
+{% extends "landing/layout.auth.html" %} {%block title%}Reset
+password{%endblock%} {% block auth %}
+<div class="p-7">
+  <h1 class="text-dark font-bold text-2xl"  data-aos="fade-up">Reset your password</h1>
+
+  <form
+    action="{{url_for('landing.reset')}}"
+    method="post"
+    class="mt-10 flex flex-col gap-3"
+  >
+    {%include 'partials/alert.html'%}
+
+    <div data-aos="zoom-in">
+      <label class="text-sm font-medium text-dark uppercase"
+        >OTP code<span class="text-red-500">*</span></label
+      >
+      <input type="text" name="code" class="custome-input" required />
+    </div>
+    <div data-aos="zoom-in">
+      <label class="text-sm font-medium text-dark uppercase"
+        >email address<span class="text-red-500">*</span></label
+      >
+      <input type="email" name="email" class="custome-input" required />
+    </div>
+    <div data-aos="zoom-in">
+      <label class="text-sm font-medium text-dark uppercase"
+        >New password<span class="text-red-500">*</span></label
+      >
+      <input type="password" name="password" class="custome-input" required />
+    </div>
+
+    <button
+      data-aos="fade-up"
+      class="py-2 px-4 mt-3 rounded-full w-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium"
+    >
+      Update now
+    </button>
+  </form>
+</div>
+
+<p data-aos="zoom-in"
+  class="mt-5 text-sm text-gray-500 bg-gray-100 w-full h-[60px] flex items-center justify-center rounded-md"
+>
+  I remember my password
+  <a href="{{url_for('landing.signin')}}" class="text-primary underline"
+    >Sign in</a
+  >
+</p>
+{%endblock%}

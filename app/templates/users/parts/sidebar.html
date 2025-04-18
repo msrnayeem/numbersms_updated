@@ -1,0 +1,109 @@
+<aside
+  class="w-[70%] md:w-[250px] h-screen p-4 bg-bg shadow-2xl md:shadow-none duration-300 fixed top-0 left-[-100%] md:left-0 md:relative z-[888]"
+  id="sidebar"
+>
+  <!-- logo -->
+  <div class="px-4 border-b border-gray-200 pb-4">
+    {% include "partials/logo.dark.html" %}
+  </div>
+
+  <!-- menu -->
+  <div class="mt-5">
+    <ul class="flex flex-col gap-y-5">
+      <li
+        class="px-4 py-2 duration-300 rounded-md {%if request.endpoint == 'user.dashboard'%}bg-dark text-white hover:bg-dark/80{%else%}text-dark hover:bg-gray-100 {%endif%}"
+      >
+        <a
+          href="{{ url_for('user.dashboard') }}"
+          class="flex items-center gap-x-3 font-semibold text-sm"
+        >
+          <i class="ri-dashboard-line"></i>
+          <p>Dashboard</p>
+        </a>
+      </li>
+      <li
+        class="px-4 py-2 duration-300 rounded-md {%if request.endpoint == 'user.verification'%}bg-dark text-white hover:bg-dark/80{%else%}text-dark hover:bg-gray-100 {%endif%}"
+      >
+        <a
+          href="{{url_for('user.verification')}}"
+          class="flex items-center gap-x-3 font-semibold text-sm"
+        >
+          <i class="ri-chat-3-line"></i>
+          <p>Verifications</p>
+        </a>
+      </li>
+      <li
+        class="px-4 py-2 duration-300 rounded-md {%if request.endpoint == 'user.creadits'%}bg-dark text-white hover:bg-dark/80{%else%}text-dark hover:bg-gray-100 {%endif%}"
+      >
+        <a
+          href="{{url_for('user.creadits')}}"
+          class="flex items-center gap-x-3 font-semibold text-sm"
+        >
+          <i class="ri-exchange-dollar-line"></i>
+          <p>Credit</p>
+        </a>
+      </li>
+      <li
+        class="px-4 py-2 duration-300 rounded-md {%if request.endpoint == 'user.support'%}bg-dark text-white hover:bg-dark/80{%else%}text-dark hover:bg-gray-100 {%endif%}"
+      >
+        <a
+          href="{{url_for('user.support')}}"
+          class="flex items-center gap-x-3 font-semibold text-sm"
+        >
+          <i class="ri-question-line"></i>
+          <p>Support<span class="text-xs text-gray-400 ml-2">(24/7)</span></p>
+        </a>
+      </li>
+      <li
+        class="px-4 py-2 duration-300 rounded-md {%if request.endpoint == 'user.account'%}bg-dark text-white hover:bg-dark/80{%else%}text-dark hover:bg-gray-100 {%endif%}"
+      >
+        <a
+          href="{{url_for('user.account')}}"
+          class="flex items-center gap-x-3 font-semibold text-sm"
+        >
+          <i class="ri-account-circle-line"></i>
+          <p>Account</p>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- avatar -->
+  <div
+    class="p-4 gap-x-4 border-b bg-white rounded-md w-[90%] mx-auto absolute bottom-3 left-0 right-0 flex flex-col items-center ring-1 ring-gray-200 border-gray-50 border-opacity-15"
+  >
+    <img
+      src="{{auth_data.get('data').get('avatar')}}"
+      class="w-[35px] h-[35px] ring-2 ring-secondary rounded-full"
+    />
+    <h2 class="text-dark font-bold text-base mt-2">
+      {{auth_data.get('data').get('name')}}
+    </h2>
+    <p class="text-dark text-sm font-normal">
+      {{auth_data.get('data').get('email')}}
+    </p>
+
+    <div class="flex items-center justify-between gap-x-2 mt-2">
+      <a
+        href="{{url_for('landing.logout')}}"
+        class="bg-red-50 text-dark bg-opacity-25 rounded-md text-center py-1 ring-1 ring-gray-300 px-3"
+        ><i class="ri-shut-down-line"></i
+      ></a>
+
+      <a
+        href="{{url_for('user.creadits')}}"
+        class="bg-white/20 rounded-md ring-1 ring-gray-300 group text-dark py-1 px-3 w-fit flex items-center gap-x-2"
+      >
+        <i
+          class="ri-wallet-2-fill text-sm mb-1 group-hover:hidden duration-300"
+        ></i>
+        <i
+          class="ri-add-large-line text-sm mb-1 hidden group-hover:flex duration-300"
+        ></i>
+        <span class="text-base font-semibold"
+          >${{"{:.2f}".format(auth_data.get('data').get('coin'))}}</span
+        >
+      </a>
+    </div>
+  </div>
+</aside>

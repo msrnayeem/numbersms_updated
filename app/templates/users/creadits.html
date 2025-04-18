@@ -1,0 +1,270 @@
+{% extends "users/layout.html" %} {% block title %}Creadits{% endblock %}
+{%block content %}
+
+<div class="bg-white p-7 rounded-md overflow-x-auto">
+  <div
+    class="flex flex-col md:flex-row gap-y-4 md:gap-y-0 items-center justify-between mb-10 border-b border-gray-100 pb-7"
+  >
+    <h1 class="text-dark text-2xl capitalize font-semibold">Creadits</h1>
+
+    <div class="flex items-center gap-x-3">
+      <a
+        href="javascript:void(0);"
+        onclick="modelhandler('deposit_model')"
+        class="btn bg-dark"
+        ><i class="ri-add-large-line"></i>Deposit</a
+      >
+      <a
+        href="javascript:void(0);"
+        onclick="modelhandler('addfound')"
+        class="btn bg-dark"
+        ><i class="ri-add-large-line text-sm"></i>Share Coin</a
+      >
+    </div>
+  </div>
+
+  <div class="mb-3">{%include 'partials/alert.html'%}</div>
+  <table id="example" class="display min-w-full">
+    <thead>
+      <tr class="bg-dark uppercase text-white h-[50px]">
+        <th class="p-0 text-left">Amount</th>
+        <th class="p-0 text-left">Gateway</th>
+        <th class="p-0 text-left">Status</th>
+        <th class="p-0 text-left">Date</th>
+        <th class="p-0 text-left">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {%if data.get('status') =='success' %} {% for user in data.get('data', [])
+      %}
+      <tr
+        class="h-[60px] border-b duration-300 hover:bg-gray-50 border-gray-100"
+      >
+        <td>
+          <span class="font-bold text-dark"
+            >${{ "{:.1f}".format(user.get('amount')) }}</span
+          >
+        </td>
+        <td>
+          <div class="flex flex-col items-start">
+            <span class="text-sm font-semibold capitalize"
+              >{{ user.get('type') }}</span
+            >
+            <small>{{ user.get('type_details') }}</small>
+          </div>
+        </td>
+        <td>
+          {%if user.get('status') =='complete' or user.get('status') == 'paid'%}
+          <span
+            class="font-bold text-green-500 bg-green-50 rounded-lg px-2 py-1 capitalize"
+            >{{user.get('status')}}</span
+          >
+          {%else%}
+          <span
+            class="font-bold text-red-500 bg-red-50 rounded-lg px-2 py-1 capitalize"
+            >{{user.get('status')}}</span
+          >
+          {%endif%}
+        </td>
+        <td>
+          <div class="flex flex-col">
+            <span class="text-base font-medium"
+              >{{ user.get('created_at').strftime('%Y-%m-%d | %H:%M:%S')
+              }}</span
+            >
+          </div>
+        </td>
+        <td>
+          <a
+            href="{{url_for('user.creadits', id=user.get('id'), order='delete')}}"
+            class="text-red-500 ml-2 flex items-center gap-x-1"
+            ><i class="ri-delete-bin-line mb-1"></i>Delete</a
+          >
+        </td>
+      </tr>
+      {% endfor %} {%endif%}
+    </tbody>
+  </table>
+</div>
+
+<!-- add found -->
+{%include '/admin/components/addfound.html'%} {% endblock %}
+
+<!-- page scripts -->
+{%block page_script%}
+<script>
+  const usersdataurl = '{{url_for("admin.userdata")}}';
+  const addfoundurl = "{{url_for('admin.foundadd')}}";
+  document
+    .getElementById("verify_button")
+    .addEventListener("click", async function () {
+      this.disabled = true;
+      this.setAttribute("oldText", this.innerHTML);
+      this.innerHTML = `<i class="ri-loader-2-line animate-spin"></i>`;
+      let user_id = document.getElementById("user_id");
+
+      if (user_id.value != "") {
+        let verify_box = document.getElementById("verify_box");
+        let v_name = document.getElementById("v_name");
+        let v_email = document.getElementById("v_email");
+
+        let payload = { id: user_id.value };
+        let data = await httpRequest(usersdataurl, "POST", payload);
+
+        if (data.status == "success" && data.data !== null) {
+          let res = data.data.data;
+          v_name.innerHTML = res.name;
+          v_email.innerHTML = res.email;
+          verify_box.classList.remove("hidden");
+          this.disabled = false;
+          this.innerHTML = this.getAttribute("oldText");
+          this.removeAttribute("oldText");
+        } else {
+          this.disabled = false;
+          this.innerHTML = this.getAttribute("oldText");
+          this.removeAttribute("oldText");
+          toastr.error("Invalid ID/Email");
+        }
+      } else {
+        this.disabled = false;
+        this.innerHTML = this.getAttribute("oldText");
+        this.removeAttribute("oldText");
+        toastr.error("User ID/Email required");
+      }
+    });
+
+  
+    document
+    .getElementById("addfoundbtn")
+    .addEventListener("click", async function () {
+      this.disabled = true;
+      this.setAttribute("oldText", this.innerHTML);
+      this.innerHTML = `<i class="ri-loader-2-line animate-spin"></i>`;;
+      let user_id = document.getElementById("user_id");
+      let amount = document.getElementById("amount");
+      let sender = "share";
+
+      if (user_id.value != "" || amount.value !== "") {
+        let payload = {
+          id: user_id.value,
+          amount: amount.value,
+          sender: sender,
+        };
+        let data = await httpRequest(addfoundurl, "POST", payload);
+        if (data.status == "success") {
+          this.disabled = false;
+          this.innerHTML = this.getAttribute('oldText')
+          this.removeAttribute('oldText')
+
+          toastr.success(data.message + " Please wait, page refreshing");
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        } else {
+          this.disabled = false;
+          this.innerHTML = this.getAttribute('oldText')
+          this.removeAttribute('oldText')
+          toastr.error(data.message);
+        }
+      } else {
+        toastr.error("All fild are required");
+      }
+    });
+
+    // deposit ammount choicer
+  const amountfild = document.getElementById("amountfild");
+  document.querySelectorAll("#amountsbtn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      amountfild.value = this.getAttribute("data-amount");
+    });
+  });
+
+  // getway select
+  const getway = document.querySelectorAll("#getway");
+
+  // select defualt
+  getway.forEach((btn) => {
+    if (btn.getAttribute("data-active") == "true") {
+      btn.classList.add("bg-primary", "text-white");
+    } else {
+      btn.classList.remove("bg-primary", "text-dark");
+    }
+  });
+
+  // select by click
+  getway.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      getway.forEach((btn) => {
+        btn.classList.remove("bg-primary", "text-white");
+        btn.setAttribute("data-active", "false");
+      });
+      this.classList.add("bg-primary", "text-white");
+      this.setAttribute("data-active", "true");
+    });
+  });
+
+  // process payment
+  const payurl = '{{url_for("pay.create_payment_session")}}';
+  document
+    .getElementById("depositproccessbtn")
+    .addEventListener("click", async function () {
+      if (amountfild.value > 0) {
+        this.disabled = true;
+        this.setAttribute("oldText", this.innerHTML);
+        this.innerHTML = `<i class="ri-loader-2-line animate-spin"></i>`;
+        // get payment getway
+        let getwaytype = "";
+        getway.forEach((btn) => {
+          if (btn.getAttribute("data-active") == "true") {
+            getwaytype = btn.getAttribute("data-type");
+          }
+        });
+
+        if (getwaytype != "") {
+          if (getwaytype == "stripe" || getwaytype == "paypal") {
+            let payload = {
+              gateway: getwaytype,
+              amount: amountfild.value,
+              currency: "usd",
+            };
+            let data = await httpRequest(payurl, "POST", payload);
+            if (data && getwaytype == "stripe") {
+              if (data.id) {
+                const stripe = Stripe("{{ stripe_pk }}");
+                return stripe.redirectToCheckout({ sessionId: data.id });
+              } else {
+                toastr.error("Payment processing failed. Please try again!");
+              }
+            } else if (data && getwaytype == "paypal") {
+              if (data.approval_url) {
+                window.location.href = data.approval_url;
+              }
+            } else {
+              toastr.error(
+                "Something went wrong. Please reload the page and try again!"
+              );
+              this.disabled = false;
+              this.innerHTML = this.getAttribute("oldText");
+              this.removeAttribute("oldText");
+            }
+          } else {
+            toastr.error(
+              "Something went wrong. Please reload the page and try again!"
+            );
+            this.disabled = false;
+            tthis.innerHTML = this.getAttribute("oldText");
+            this.removeAttribute("oldText");
+          }
+        } else {
+          toastr.error("Select payment gateway");
+          this.disabled = false;
+          this.innerHTML = this.getAttribute("oldText");
+          this.removeAttribute("oldText");
+        }
+      } else {
+        toastr.error("Select amount first");
+      }
+    });
+</script>
+{%endblock%}

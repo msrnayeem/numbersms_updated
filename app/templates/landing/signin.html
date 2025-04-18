@@ -1,0 +1,51 @@
+{% extends "landing/layout.auth.html" %} {%block title%}Login account{%endblock%} {%
+block auth %}
+<div class="p-7">
+  <h1 class="text-dark font-bold text-2xl"  data-aos="fade-up">Sign in to your account</h1>
+
+  <form
+    action="{{url_for('landing.signin')}}"
+    method="post"
+    class="mt-10 flex flex-col gap-3"
+  >
+    {%include 'partials/alert.html'%}
+
+    <div data-aos="zoom-in">
+      <label class="text-sm font-medium text-dark uppercase"
+        >email address<span class="text-red-500">*</span></label
+      >
+      <input type="email" name="email" class="custome-input" required />
+    </div>
+    <div data-aos="zoom-in">
+      <label class="text-sm font-medium text-dark uppercase"
+        >Password<span class="text-red-500">*</span></label
+      >
+      <input type="password" name="password" class="custome-input" required />
+    </div>
+
+    <div class="flex items-center justify-end" data-aos="zoom-in">
+      <a
+        class="text-sm font-normal text-gray-400 flex items-center gap-1"
+        href="{{url_for('landing.forget')}}"
+        >Forget password?</a
+      >
+    </div>
+
+    <button
+      data-aos="fade-up"
+      class="py-2 px-4 mt-3 rounded-full w-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium"
+    >
+      sign in
+    </button>
+  </form>
+</div>
+
+<p data-aos="zoom-in"
+  class="mt-5 text-sm text-gray-500 bg-gray-100 w-full h-[60px] flex items-center justify-center rounded-md"
+>
+  Create a new account?
+  <a href="{{url_for('landing.signup')}}" class="text-primary underline"
+    >Sign up</a
+  >
+</p>
+{%endblock%}

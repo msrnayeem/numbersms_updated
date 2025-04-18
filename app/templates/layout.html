@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Numbersms{% endblock %}</title>
+    <link rel="shortcut icon" href="{{url_for('static', filename='media/logo.png')}}" type="image/x-icon">
+    
+    <!-- =========== global style =========== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Arima:wght@100..700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/output.css') }}"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/icons/remixicon.css') }}"
+      rel="stylesheet"
+    />
+    <!-- ========= all style for landing page ========= -->
+    {% if not request.path.startswith('/user') and not
+    request.path.startswith('/admin') %}
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='vendor/aos/aos.css') }}"
+    />
+    {%endif%}
+    <!-- =========== all styles for dashboard ========= -->
+    {% if request.path.startswith('/user') or request.path.startswith('/admin')
+    %}
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='vendor/toster/toastr.min.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='vendor/table/dataTables.tailwindcss.css') }}"
+    />
+    {%endif%}
+  </head>
+  <body
+    class="font-arima min-w-full box-border min-h-screen selection:bg-primary selection:text-white"
+  >
+    {% block body %} {% endblock %}
+
+    <!-- ========= global scripts ========= -->
+    <script src="{{url_for('static', filename='vendor/jquery/jquery-3.7.1.js')}}"></script>
+    <script src="{{url_for('static', filename='js/http.js')}}"></script>
+    <script src="{{url_for('static', filename='js/main.js')}}"></script>
+    <!-- ======= all scripts for landing page ========= -->
+    {% if not request.path.startswith('/user') and not
+    request.path.startswith('/admin') %}
+    <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+    {% endif %}
+    <!-- ========== all scripts for dashboard ============ -->
+    {% if request.path.startswith('/user') or request.path.startswith('/admin')
+    %}
+    <script src="https://js.stripe.com/v3"></script>
+    <script src="{{ url_for('static', filename='vendor/toster/toastr.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/table/dataTables.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/table/dataTables.tailwindcss.js') }}"></script>
+    <script>
+      // toster message
+      toastr.options.closeButton = true;
+      toastr.options.closeMethod = "fadeOut";
+      toastr.options.closeDuration = 300;
+      toastr.options.closeEasing = "swing";
+      toastr.options.progressBar = true;
+
+      // data table
+      new DataTable("#example", {
+        info: false,
+        ordering: true,
+        layout: {
+          topStart: "search",
+          topEnd: null,
+          bottomStart: {
+            paging: true,
+          },
+          bottomEnd: null,
+        },
+      });
+    </script>
+    {%endif%} {%block page_script%}{% endblock %}
+  </body>
+</html>

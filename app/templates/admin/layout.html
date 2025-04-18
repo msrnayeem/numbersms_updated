@@ -1,0 +1,18 @@
+{% extends "layout.html" %}{% block body %}
+<main class="w-full h-screen overflow-y-hidden flex">
+  <!-- sidebar -->
+  {% include "admin/parts/sidebar.html" %}
+  <!-- content -->
+  <section
+    class="w-full md:w-[calc(100%-250px)] h-screen bg-bg"
+    id="dashcontent"
+  >
+    {% include "admin/parts/navbar.html" %}
+    <div
+      class="w-full h-screen pt-4 pl-4 pr-4 md:pt-7 md:pr-7 md:pl-7 pb-28 overflow-y-auto"
+    >
+      {%block content%}{%endblock%}
+    </div>
+  </section>
+</main>
+{%endblock%}

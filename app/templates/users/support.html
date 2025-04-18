@@ -1,0 +1,175 @@
+{% extends "users/layout.html" %} {% block title %}Support{% endblock %} {%block
+content %}
+
+<div class="bg-white p-7 rounded-md overflow-x-auto">
+  <div
+    class="flex flex-col md:flex-row gap-y-4 md:gap-y-0 items-center justify-between mb-10 border-b border-gray-100 pb-7"
+  >
+    <h1 class="text-dark text-2xl capitalize font-bold">Supports</h1>
+
+    <div class="flex items-center gap-x-3">
+      <a
+        href="javascript:void(0);"
+        onclick="modelhandler('support_ticket_model')"
+        class="btn"
+        ><i class="ri-add-large-line"></i>Open Ticket</a
+      >
+    </div>
+  </div>
+
+  <div class="mb-3">{%include 'partials/alert.html'%}</div>
+  <table id="example" class="display min-w-full">
+    <thead>
+      <tr class="bg-dark uppercase text-white h-[50px]">
+        <th class="p-0 text-left">Date</th>
+        <th class="p-0 text-left">Subject</th>
+        <th class="p-0 text-left">Message</th>
+        <th class="p-0 text-left">Status</th>
+        <th class="p-0 text-left">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {%if data.get('status') =='success' %} {% for user in data.get('data', [])
+      %}
+      <tr
+        class="h-[60px] border-b duration-300 hover:bg-gray-50 border-gray-100"
+      >
+        <td>{{ user.get('created_at').strftime('%Y-%m-%d | %H:%M:%S') }}</td>
+        <td>{{ user.get('subject') }}</td>
+        <td>{{ user.get('message') }}</td>
+        <td>
+          {% if user.get('reply') > 0 %}
+          <p
+            class="bg-red-50 text-red-500 px-3 py-1 rounded-full text-base font-normal w-fit"
+          >
+            closed
+          </p>
+          {% elif user.get('reply') == 0 %}
+          <p
+            class="bg-green-50 text-green-500 px-3 py-1 rounded-full text-base font-normal w-fit"
+          >
+            open
+          </p>
+          {% endif %}
+        </td>
+        <td>
+          <div class="flex items-center gap-x-3">
+            <a
+              href="{{url_for('user.support', id=user.get('id'), order='delete')}}"
+              class="text-red-500 ml-2 flex items-center gap-x-1"
+              ><i class="ri-delete-bin-line mb-1"></i>Delete</a
+            >
+          </div>
+        </td>
+      </tr>
+      {% endfor %} {%endif%}
+    </tbody>
+  </table>
+</div>
+
+{%if rating and rating.get('data') == 0%}
+<div class="w-fit fixed right-5 bottom-5" id="rating_widget">
+  <small class="text-dark">Write a review</small>
+  <div class="shadow-md overflow-hidden rounded-md bg-white">
+    <ul class="flex items-center px-2" id="ratinng_btn_main">
+      <li
+        id="ratinng_btn"
+        class="w-[30px] h-[40px] flex items-center justify-center"
+      >
+        <i class="ri-star-s-line text-lg text-yellow-400 duration-300"></i>
+      </li>
+      <li
+        id="ratinng_btn"
+        class="w-[30px] h-[40px] flex items-center justify-center"
+      >
+        <i class="ri-star-s-line text-lg text-yellow-400 duration-300"></i>
+      </li>
+      <li
+        id="ratinng_btn"
+        class="w-[30px] h-[40px] flex items-center justify-center"
+      >
+        <i class="ri-star-s-line text-lg text-yellow-400 duration-300"></i>
+      </li>
+      <li
+        id="ratinng_btn"
+        class="w-[30px] h-[40px] flex items-center justify-center"
+      >
+        <i class="ri-star-s-line text-lg text-yellow-400 duration-300"></i>
+      </li>
+      <li
+        id="ratinng_btn"
+        class="w-[30px] h-[40px] flex items-center justify-center"
+      >
+        <i class="ri-star-s-line text-lg text-yellow-400 duration-300"></i>
+      </li>
+    </ul>
+  </div>
+</div>
+{%endif%}
+
+<!-- support model -->
+{%include '/users/components/rating.model.html' %} {%include
+'/users/components/support.mode.html' %} {% endblock %}
+<!-- page scripts -->
+{%block page_script%}
+<script>
+  //   create support
+  const tikcrturl = "{{url_for('user.support')}}";
+  document
+    .getElementById("supporcreatebtn")
+    .addEventListener("click", async function () {
+      this.disabled = true;
+      this.setAttribute("oldText", this.innerHTML);
+      this.innerHTML = `<i class="ri-loader-2-line animate-spin"></i>`;
+
+      const subject = document.getElementById("s_subject");
+      const message = document.getElementById("s_message");
+
+      if (subject.value != "" && message.value != "") {
+        let payload = { subject: subject.value, message: message.value };
+        let data = await httpRequest(tikcrturl, "POST", payload);
+
+        if (data.status == "success") {
+          toastr.success(data.message + "Redirecting..");
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          toastr.error(data.message);
+          this.disabled = false;
+          this.innerHTML = this.getAttribute("oldText");
+          this.removeAttribute("oldText");
+        }
+      } else {
+        toastr.error("All filds are required");
+        this.disabled = false;
+        this.innerHTML = this.getAttribute("oldText");
+        this.removeAttribute("oldText");
+      }
+    });
+
+  // rating
+  const ratinng_btn = document.querySelectorAll("#ratinng_btn");
+  let selectedRating = 0;
+
+  ratinng_btn.forEach((ele, index) => {
+    ele.addEventListener("mouseover", function () {
+      ratinng_btn.forEach((btn, i) => {
+        if (i <= index) {
+          btn.querySelector("i").classList.remove("ri-star-s-line");
+          btn.querySelector("i").classList.add("ri-star-s-fill");
+        } else {
+          btn.querySelector("i").classList.remove("ri-star-s-fill");
+          btn.querySelector("i").classList.add("ri-star-s-line");
+        }
+      });
+    });
+
+    ele.addEventListener("click", function () {
+      selectedRating = index + 1;
+      modelhandler("rating_model", loadrating(selectedRating));
+    });
+  });
+</script>
+{%endblock%}

@@ -1,0 +1,304 @@
+<div
+  id="opt_model"
+  class="fixed pointer-events-none opacity-0 duration-300 inset-0 z-[999] w-full h-screen bg-dark/20 backdrop-blur-md flex items-center justify-center"
+>
+  <div
+    id="model_body"
+    class="bg-white duration-300 scale-50 opacity-0 pointer-events-none rounded-md p-5 border border-gray-100 w-[90%] md:w-[500px]"
+  >
+    <header
+      class="flex items-center justify-between border-b border-gray-200 pb-5"
+    >
+      <h1 class="text-dark text-lg font-semibold">
+        Service for <span id="service_name"></span>
+      </h1>
+      <button onclick="modelhandler('opt_model', '', resetmodel())" class="btn">
+        <i class="ri-close-large-fill"></i>
+      </button>
+    </header>
+
+    <div class="mt-5">
+      <div class="flex items-center justify-between">
+        <input
+          type="text"
+          class="custome-input h-[38px] rounded-r-none"
+          readonly
+          id="number"
+        />
+        <button
+          onclick="clipboard('number', true)"
+          class="btn rounded-l-none h-[38px] border border-dark"
+        >
+          <i class="ri-file-copy-line"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mt-3">
+        <div>
+          <label class="text-sm text-gray-500 font-semibold">Price</label>
+          <input
+            id="price"
+            type="text"
+            class="custome-input h-[38px]"
+            readonly
+          />
+        </div>
+        <div>
+          <label class="text-sm text-gray-500 font-semibold">Time</label>
+          <input
+            id="time"
+            type="text"
+            class="custome-input h-[38px]"
+            readonly
+          />
+        </div>
+      </div>
+      <div
+        class="mt-3 p-5 flex items-center justify-center rounded-md bg-gray-100"
+      >
+        <p
+          data-older='<i class="ri-loader-2-line animate-spin"></i>'
+          id="message"
+          class="text-base font-medium text-center text-gray-700"
+        >
+          <i class="ri-loader-2-line animate-spin"></i>
+        </p>
+      </div>
+      <div class="items-center justify-between mt-3 hidden" id="otpBox">
+        <input
+          type="text"
+          class="custome-input h-[38px] rounded-r-none"
+          readonly
+          id="otp"
+        />
+        <button
+          onclick="clipboard('otp')"
+          class="btn rounded-l-none h-[38px] border border-dark"
+        >
+          <i class="ri-file-copy-line"></i>
+        </button>
+      </div>
+      <button
+        id="cancel_btn"
+        data-order="model"
+        onclick="cancelservice(this)"
+        class="btn bg-red-500 mt-3 justify-center hover:bg-red-500/80 w-full"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+{%block page_script%}
+<script>
+  const number_fild = document.getElementById("number");
+  const price_fild = document.getElementById("price");
+  const time_fild = document.getElementById("time");
+  const message_fild = document.getElementById("message");
+  const otp_fild = document.getElementById("otp");
+  const cancel_btn = document.getElementById("cancel_btn");
+  const otpBox = document.getElementById("otpBox");
+  const service_name = document.getElementById("service_name");
+  let datadone = false;
+
+  // reset system when modal closes
+  function resetmodel() {
+    number_fild.value = "";
+    price_fild.value = "";
+    time_fild.value = "";
+    otp_fild.value = "";
+    otpBox.classList.remove("flex");
+    otpBox.classList.add("hidden");
+    service_name.innerHTML = "";
+    message_fild.innerHTML = message_fild.getAttribute("data-older");
+  }
+
+  // load otp data and start verifying
+  async function loadveerifydata(data) {
+    datadone = false;
+    message_fild.innerHTML = message_fild.getAttribute("data-older");
+
+    if (!data) {
+      toastr.error("Verification ID not found");
+      modelhandler("opt_model");
+      return;
+    }
+
+    cancel_btn.classList.remove("hidden");
+    cancel_btn.setAttribute("data-id", data.id);
+    number_fild.value = "+1" + data.number;
+    price_fild.value = "$" + data.price;
+    startCountdown(data.created_at, data.endsAt);
+
+    const endTime = new Date(data.endsAt);
+    otpBox.classList.add("hidden");
+    otpBox.classList.remove("flex");
+
+    const checkOtpInterval = setInterval(async () => {
+      const now = new Date();
+
+      if (now >= endTime) {
+        datadone = true;
+        otp_fild.value = "None";
+        time_fild.value = "00:00";
+
+        // update databse
+        let statusdata = await httpRequest(
+          '{{url_for("api.timeout")}}',
+          "POST",
+          { id: data.id }
+        );
+        if (statusdata.status == "success") {
+          updateVerificationTable(data, true);
+          cancel_btn.classList.add("hidden");
+          clearInterval(checkOtpInterval);
+        }
+        return;
+      }
+
+      if (!datadone) {
+        const url = "{{url_for('api.otp')}}";
+        const payload = { id: data.id };
+        const checkResponse = await httpRequest(url, "POST", payload);
+
+        if (checkResponse.status === "success" && checkResponse.data) {
+          const otpData = checkResponse.data;
+          datadone = true;
+
+          otp_fild.value = otpData.opt;
+          message_fild.innerHTML = otpData.sms;
+          service_name.innerHTML = otpData.service_name;
+          otpBox.classList.remove("hidden");
+          otpBox.classList.add("flex");
+
+          updateVerificationTable(otpData, false); // success
+          cancel_btn.classList.add("hidden");
+          clearInterval(checkOtpInterval);
+        }
+      }
+    }, 3000);
+  }
+
+  // time counter
+  function startCountdown(created_at, endsAt) {
+    const createdAtDate = new Date(created_at);
+    const endsAtDate = new Date(endsAt);
+    let interval; // declare interval outside
+
+    function updateCountdown() {
+      const now = new Date();
+      const remainingTime = endsAtDate - now;
+
+      if (remainingTime <= 0 || datadone) {
+        time_fild.value = "00:00";
+        datadone = true;
+        clearInterval(interval);
+        cancel_btn.classList.add("hidden");
+        return;
+      }
+
+      const minutes = Math.floor(
+        (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
+      );
+      const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+      time_fild.value = `${String(minutes).padStart(2, "0")}:${String(
+        seconds
+      ).padStart(2, "0")}`;
+    }
+
+    updateCountdown(); // initial call
+    interval = setInterval(updateCountdown, 1000);
+  }
+
+  // update table
+  function updateVerificationTable(data, isTimeout = false) {
+    const row = document.querySelector(`tr[data-vid="${data.service_token}"]`);
+    if (row) row.remove();
+
+    const statusText = isTimeout
+      ? "Timeout"
+      : data.status === "pending"
+      ? "Pending"
+      : data.status === "complete"
+      ? "Complete"
+      : "Unknown";
+
+    const statusClass = isTimeout
+      ? "text-red-500 bg-red-50"
+      : data.status === "pending"
+      ? "text-yellow-500 bg-yellow-50"
+      : data.status === "complete"
+      ? "text-green-500 bg-green-50"
+      : "text-gray-500 bg-gray-50";
+
+    const html = `<tr data-vid="${data.service_token}" data-status="${
+      data.status
+    }" data-id="${data.id}"
+    class="h-[60px] border-b duration-300 hover:bg-gray-50 border-gray-100">
+    <td>${data.service_name}</td>
+    <td>$${data.price}</td>
+    <td>${data.number}</td>
+    <td>${data.opt ? data.opt : "None"}</td>
+    <td>#${data.server_id}</td>
+    <td>
+      <span class="font-bold ${statusClass} rounded-lg px-2 py-1 capitalize">${statusText}</span>
+    </td>
+    <td>
+      <div class="flex items-center gap-x-3">
+        ${
+          data.status === "pending" && !isTimeout
+            ? `
+        <button data-id="${data.id}" onclick="openverify(this)" class="text-blue-500 ml-2 flex items-center gap-x-1">
+          <i class="ri-eye-line mb-1"></i>Open
+        </button>
+        <button data-id="${data.id}" onclick="cancelservice(this)" class="text-red-500 ml-2 flex items-center gap-x-1">
+          <i class="ri-delete-bin-line mb-1"></i>Cancel
+        </button>`
+            : "--"
+        }
+      </div>
+    </td>
+  </tr>`;
+
+    verification_tale_body.insertAdjacentHTML("afterbegin", html);
+  }
+
+  // clipboard function
+  function clipboard(target, order = false) {
+    if (target) {
+      let value = document.getElementById(target).value;
+      if (order) {
+        value = value.replace("+1", "").trim();
+      } else {
+        value = value.trim();
+      }
+      navigator.clipboard
+        .writeText(value)
+        .then(() => {
+          toastr.success("Copied to clipboard!");
+        })
+        .catch((err) => {
+          toastr.error("Failed to copy!");
+        });
+    }
+  }
+
+  // Auto-detect active service on page reload using the table row
+  window.addEventListener("DOMContentLoaded", async () => {
+    const data_url = "{{url_for('api.getdata')}}";
+    const pendingRow = document.querySelector('tr[data-status="pending"]');
+    if (pendingRow) {
+      // Get the service ID from the pending row attribute
+      const serviceId = pendingRow.getAttribute("data-id");
+      // Build payload to request full details
+      const payload = { id: serviceId };
+      // Call your API to retrieve service details (this should return full data including created_at and endsAt)
+      const response = await httpRequest(data_url, "POST", payload);
+      if (response.status === "success" && response.data) {
+        loadveerifydata(response.data);
+      }
+    }
+  });
+</script>
+{%endblock%}

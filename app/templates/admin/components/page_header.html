@@ -1,0 +1,9 @@
+{% macro header(title, button_html="") %}
+<div
+  class="mb-10 flex flex-col md:flex-row gap-y-3 border-b border-gray-200 pb-4 md:gap-y-0 items-center justify-between"
+>
+  <h1 class="text-2xl uppercase font-bold text-dark flex items-center">{{ title }}</h1>
+
+  <div class="flex items-center gap-x-2">{{ button_html|safe }}</div>
+</div>
+{% endmacro %}

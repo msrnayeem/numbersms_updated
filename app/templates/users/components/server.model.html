@@ -1,0 +1,180 @@
+<div
+  id="choice_server_model"
+  class="fixed pointer-events-none opacity-0 duration-300 inset-0 z-[999] w-full h-screen bg-dark/20 backdrop-blur-md flex items-center justify-center"
+>
+  <div
+    id="model_body"
+    class="bg-white duration-300 scale-50 opacity-0 pointer-events-none rounded-md p-5 border border-gray-100 w-[90%] md:w-[500px]"
+  >
+    <header
+      class="flex items-start justify-between border-b border-gray-200 pb-5"
+    >
+      <div class="w-[80%]">
+        <h1 class="text-dark text-lg font-semibold">Select a Server</h1>
+        <p class="text-xs text-gray-400 mt-1">
+          Need help?
+          <a href="{{url_for('user.support')}}" class="text-blue-500 underline"
+            >Contact Support</a
+          >.
+        </p>
+      </div>
+      <button onclick="modelhandler('choice_server_model')" class="btn">
+        <i class="ri-close-large-fill"></i>
+      </button>
+    </header>
+
+    <div class="mt-5">
+      <div class="grid grid-cols-2 gap-3" id="serverbox">
+        <!-- loaad from js -->
+      </div>
+
+      <!-- defulat server set -->
+      <div class="mt-5 border-t border-gray-200 pt-5">
+        <p class="text-sm text-gray-500">
+          If you enable the default server, you won't need to select a server
+          each time. This feature will save your preference for future use.
+        </p>
+        <div class="flex items-center justify-between mt-1">
+          <span class="text-gray-700">Enable Default Server</span>
+          <div class="flex items-center">
+            <input
+              id="server"
+              type="checkbox"
+              onchange="toggleDefaultServer(this)"
+              class="hidden"
+            />
+            <label
+              for="server"
+              id="slider"
+              class="relative mr-4 w-8 h-4 rounded-full bg-red-600 cursor-pointer"
+            ></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%block page_script%}
+<script>
+  let selectedServer = null;
+  // load sserver
+  const serverbox = document.getElementById("serverbox");
+  async function loadservers() {
+    let data = await httpRequest("{{url_for('user.serverget')}}", "POST", {});
+    
+    if (data.status == "success" && data.data.data.length > 0) {
+      const servers_data = data.data.data;
+
+      // Use DocumentFragment for better performance
+      serverbox.innerHTML = "";
+      const fragment = document.createDocumentFragment();
+      servers_data.forEach((ele) => {
+        const button = document.createElement("button");
+        button.className =
+          "bg-gray-100 w-full text-dark rounded-md text-base font-semibold duration-300 hover:bg-primary hover:text-white h-[40px] flex items-center justify-center";
+        button.setAttribute("data-id", ele.id);
+        button.innerHTML = ele.server_name;
+        fragment.appendChild(button);
+      });
+      serverbox.appendChild(fragment);
+      modelhandler("choice_server_model");
+
+      // selectserver
+      const serverButtons = document.querySelectorAll("#serverbox button");
+      serverButtons.forEach((button) => {
+        // set defualt server
+        const serverKey = JSON.parse(localStorage.getItem("server_key")) || {};
+        if (
+          serverKey &&
+          serverKey.server_id == button.getAttribute("data-id") &&
+          serverKey.defualt
+        ) {
+          button.classList.remove("bg-gray-100", "text-dark");
+          button.classList.add("bg-primary", "text-white");
+          selectedServer = button;
+
+          // set default server
+          document.getElementById("server").checked = true;
+        } else {
+          button.classList.remove("bg-primary", "text-white");
+          button.classList.add("bg-gray-100", "text-dark");
+        }
+
+        // after click button
+        button.addEventListener("click", async function () {
+          const serverId = this.getAttribute("data-id");
+          this.disabled = true;
+          this.innerHTML = `<i class="ri-loader-2-line animate-spin"></i>`;
+          this.setAttribute("oldText", this.innerHTML);
+
+          // chnage seerver key
+          const data = JSON.parse(localStorage.getItem("server_key")) || {};
+          if (data) {
+            if (data.defualt) {
+              localStorage.setItem(
+                "server_key",
+                JSON.stringify({ defualt: true, server_id: serverId })
+              );
+            } else {
+              localStorage.setItem(
+                "server_key",
+                JSON.stringify({ defualt: false, server_id: serverId })
+              );
+            }
+          }
+
+          if (selectedServer) {
+            selectedServer.classList.remove("bg-primary", "text-white");
+            selectedServer.classList.add("bg-gray-100", "text-dark");
+          }
+          this.classList.remove("bg-gray-100", "text-dark");
+          this.classList.add("bg-primary", "text-white");
+          selectedServer = this;
+          load();
+          this.disabled = false;
+          this.innerHTML = this.getAttribute("oldText");
+          this.removeAttribute("oldText");
+          setTimeout(() => {
+            modelhandler("choice_server_model");
+          }, 1000);
+        });
+      });
+    } else {
+      toastr.error("server not found! please " + `<a class='underline' href='{{url_for('user.support')}}'>contact support.</a>`);
+    }
+  }
+
+  // seelect server model
+  function toggleDefaultServer(e) {
+    const isChecked = e.checked;
+    if (isChecked) {
+      if (selectedServer) {
+        localStorage.setItem(
+          "server_key",
+          JSON.stringify({
+            defualt: true,
+            server_id: selectedServer.getAttribute("data-id"),
+          })
+        );
+        toastr.success("Default server has been set!");
+      } else {
+        toastr.error("Please select a server first!");
+        e.checked = false;
+      }
+    } else {
+      const data = JSON.parse(localStorage.getItem("server_key")) || {};
+      if (data) {
+        localStorage.setItem(
+          "server_key",
+          JSON.stringify({
+            defualt: false,
+            server_id: selectedServer.getAttribute("data-id"),
+          })
+        );
+      }
+      toastr.warning("Default server has been disabled!");
+    }
+  }
+</script>
+{%endblock%}

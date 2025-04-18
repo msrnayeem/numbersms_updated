@@ -1,0 +1,124 @@
+{% extends "admin/layout.html" %}
+
+<!-- page title -->
+{% block title %}Servers{% endblock %} {%block content %}
+
+<!-- data table -->
+<div class="bg-white p-5 rounded-md overflow-x-auto">
+  <div class="mb-3">{%include 'partials/alert.html'%}</div>
+
+  <!-- page header -->
+  {% from '/admin/components/page_header.html' import header %} {{
+  header("Supports") }}
+  <table id="example" class="display min-w-full">
+    <thead>
+      <tr class="bg-primary text-white h-[50px]">
+        <th class="p-0 text-left">Name</th>
+        <th class="p-0 text-left">Credits</th>
+        <th class="p-0 text-left">Message</th>
+        <th class="p-0 text-left">Reply</th>
+        <th class="p-0 text-left">Date</th>
+        <th class="p-0 text-left">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {%if data.get('status') =='success' %} {% for user in data.get('data', [])
+      %}
+      <tr
+        class="h-[60px] border-b duration-300 hover:bg-gray-50 border-gray-100"
+      >
+        <td>{{ user.get('name') }}</td>
+        <td>
+          <div class="flex flex-col">
+            <span class="text-base font-medium underline mb-1">
+              <a href="mailto:{{ user.get('email') }}"
+                >{{ user.get('email') }}</a
+              >
+            </span>
+            <span class="text-sm underline text-primary"
+              ><a href="tel:{{ user.get('phone') }}"
+                >{{ user.get('phone') }}</a
+              ></span
+            >
+          </div>
+        </td>
+        <td>
+          <div>
+            <h2 class="text-lg font-semibold">{{ user.get('subject') }}</h2>
+            <p class="text-gray-500">{{ user.get('message') }}</p>
+          </div>
+        </td>
+        <td>#{{ user.get('reply') }} times</td>
+        <td>{{ user.get('created_at').strftime('%Y-%m-%d | %H:%M:%S') }}</td>
+        <td>
+          <div class="flex items-center gap-x-3">
+            <a
+              href="javascript:void(0);"
+              data-email="{{user.get('email')}}"
+              onclick="showreply(this)"
+              class="text-blue-500 ml-2 flex items-center gap-x-1"
+              ><i class="ri-reply-line mb-1"></i>Reply</a
+            >
+            <a
+              href="{{url_for('admin.support', id=user.get('id'), order='delete')}}"
+              class="text-red-500 ml-2 flex items-center gap-x-1"
+              ><i class="ri-delete-bin-line mb-1"></i>Delete</a
+            >
+          </div>
+        </td>
+      </tr>
+      {% endfor %} {%endif%}
+    </tbody>
+  </table>
+</div>
+
+<!-- model -->
+{%include '/admin/components/emialreply.mode.html'%} {% endblock %}
+
+<!-- page scripts -->
+{%block page_script%}
+<script>
+  // show showreplya
+  function showreply(e) {
+    const user_email = e.getAttribute("data-email");
+    if (user_email != "") {
+      email.value = e.getAttribute("data-email");
+      modelhandler("suppor_reply");
+    } else {
+      toastr.error("Something else try again. or refresh the page");
+    }
+  }
+
+  // reply post
+  const supporturl = '{{url_for("admin.supportreply")}}';
+  document
+    .getElementById("supportreplybtn")
+    .addEventListener("click", async function () {
+      const email = document.getElementById("email");
+      const subject = document.getElementById("subject");
+      const message = document.getElementById("message");
+      this.disabled = true;
+      this.innerHTML = "Sending..";
+
+      if (email.value != "" && subject.value != "" && message.value != "") {
+        let payload = {
+          email: email.value,
+          subject: subject.value,
+          message: message.value,
+        };
+        let data = await httpRequest(supporturl, "POST", payload);
+        if (data.status == "success") {
+          toastr.success(data.message + "redirecting...");
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
+      } else {
+        toastr.error("All filds are required");
+        this.disabled = false;
+        this.innerHTML = "Reply now";
+      }
+    });
+</script>
+{%endblock%}

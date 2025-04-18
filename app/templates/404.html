@@ -1,0 +1,30 @@
+{% extends "layout.html" %} {%block title%}404{%endblock%} {% block body %}
+<section class="bg-bg w-full h-screen overflow-hidden relative z-[1]">
+  <div
+    class="container flex flex-col gap-3 items-center justify-center h-screen"
+  >
+    <img data-aos="zoom-in"
+      src="{{url_for('static', filename='media/error-404.png')}}"
+      class="w-[120px] h-auto"
+    />
+    <h1 data-aos="fade-up" class="text-4xl font-bold text-primary w-full md:w-[450px] text-center">
+      Uh oh. Sorry! This page doesn't exist.
+    </h1>
+    <p data-aos="fade-up" class="text-gray-500 text-sm font-normal">
+      Search again what you're looking for
+    </p>
+    <a
+      href="/"
+      data-aos="fade-up"
+      class="py-2 px-4 mt-3 rounded-full w-fit group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium"
+    >
+      <i class="ri-arrow-left-line"></i>
+      Go back home
+    </a>
+  </div>
+  <img
+    src="{{url_for('static', filename='media/404.svg')}}"
+    class="absolute w-full h-full object-cover inset-0 opacity-5 z-[-1]"
+  />
+</section>
+{%endblock%}

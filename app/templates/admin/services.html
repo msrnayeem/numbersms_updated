@@ -1,0 +1,167 @@
+{% extends "admin/layout.html" %}
+
+<!-- page title -->
+{% block title %}Services{% endblock %} {%block content %}
+
+<!-- table -->
+<div class="bg-white p-5 rounded-md overflow-x-auto">
+  <div class="mb-3">{%include 'partials/alert.html'%}</div>
+  <!-- page header -->
+  {% from '/admin/components/page_header.html' import header %} {{
+  header("Services") }}
+
+  <table id="example" class="display min-w-full">
+    <thead>
+      <tr class="bg-primary text-white h-[50px]">
+        <th class="p-0 text-left">Name</th>
+        <th class="p-0 text-left">Custome Name</th>
+        <th class="p-0 text-left">Price</th>
+        <th class="p-0 text-left">Selling Price</th>
+        <th class="p-0 text-left">Discount(%)</th>
+        <th class="p-0 text-left">Status</th>
+        <th class="p-0 text-left">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="services_box"></tbody>
+  </table>
+
+  <!-- add model -->
+  {%include '/admin/components/service.model.html'%} {%endblock%} {%block
+  page_script%}
+  <script>
+    window.addEventListener("DOMContentLoaded", function () {
+      const services_box = document.getElementById("services_box");
+      async function loaddata() {
+        const url = "{{url_for('admin.servicesdata')}}";
+        const data = await httpRequest(url, "POST", {});
+        if (data.status == "success" && data.data.data) {
+          const final_data = data.data.data;
+          if ($.fn.DataTable.isDataTable("#example")) {
+            $("#example").DataTable().clear().destroy();
+          }
+          const fragment = document.createDocumentFragment();
+          final_data.forEach((ele) => {
+            const row = document.createElement("tr");
+            row.classList.add(
+              "h-[60px]",
+              "border-b",
+              "duration-300",
+              "hover:bg-gray-50",
+              "border-gray-100"
+            );
+            row.setAttribute("data-id", ele.id);
+            row.innerHTML = createrow(ele);
+            fragment.appendChild(row);
+          });
+          services_box.innerHTML = "";
+          services_box.appendChild(fragment);
+          $("#example").DataTable({
+            info: false,
+            ordering: true,
+            layout: {
+              topStart: "search",
+              topEnd: null,
+              bottomStart: {
+                paging: true,
+              },
+              bottomEnd: null,
+            },
+          });
+        } else {
+          toastr.error(data.message);
+        }
+      }
+      loaddata();
+
+      // create row
+      function createrow(data) {
+        return `
+          <td>
+             <div class='flex items-center gap-x-2'>
+              <img class='w-[30px] h-[30px] rounded-full object-contain' src="${
+                data.image ? data.image : "{{ get_media() }}"
+              }"/>
+              <span>${data.service}</span>
+            </div>
+          </td>
+          <td>${data.custome_name ? data.custome_name : "--"}</td>
+          <td>$${data.price}</td>
+          <td>$${data.selling_price.toFixed(2)}</td>
+          <td>${data.discount}</td>
+          <td>
+            <div class="flex items-center gap-x-2">
+              <span class="flex items-center gap-x-1">
+                <i class="${
+                  data.status == "on"
+                    ? "ri-checkbox-circle-line text-green-400"
+                    : "ri-close-circle-line text-red-400"
+                }"></i> ${data.status}
+              </span>
+
+              <div class="flex items-center">
+                <input type="checkbox" onchange="statuschange(this)" data-id="${
+                  data.id
+                }" id="${data.id}" class="hidden" ${data.status == "on" ? "checked" : ""}>
+                <label
+                  for="${data.id}"
+                  id="slider"
+                  class="relative mr-4 w-8 h-4 rounded-full bg-red-600 cursor-pointer"
+                ></label>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="flex items-center gap-x-3">
+              <a
+                href="javascript:void(0);"
+                data-id="${data.id}"
+                onclick="edit(this)"
+                class="text-blue-500 flex items-center gap-x-1"
+                ><i class="ri-pencil-line mb-1"></i>Edit</a
+              >
+            </div>
+          </td>`;
+      }
+    });
+
+    // update
+    const servicedataurl = '{{url_for("admin.servicesdatasingle")}}';
+    async function edit(e) {
+      let id = e.getAttribute("data-id");
+      let payload = { id: id };
+      let data = await httpRequest(servicedataurl, "POST", payload);
+      if (data.status == "success") {
+        modelhandler("service_model", loaddata(data.data));
+      } else {
+        toastr.error(data.message);
+      }
+    }
+
+    // changes status
+    const statuschangeurl = '{{url_for("admin.servicestatus")}}';
+    async function statuschange(e) {
+      let id = e.getAttribute("data-id");
+      let payload = { id: id };
+      let data = await httpRequest(statuschangeurl, "POST", payload);
+      if (data.status == "success") {
+        toastr.success(data.message);
+        let ele = e.parentElement.parentElement.children[0];
+        ele.innerHTML = "";
+        ele.innerHTML = `<i class="${
+          data.data == "on"
+            ? "ri-checkbox-circle-line text-green-400"
+            : "ri-close-circle-line text-red-400"
+        }"></i> ${data.data}`;
+        if (data.data == "on") {
+          e.checked = true;
+        } else {
+          e.checked = false;
+        }
+      } else {
+        toastr.error(data.message);
+        e.checked = false;
+      }
+    }
+  </script>
+  {%endblock%}
+</div>

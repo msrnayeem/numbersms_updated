@@ -1,0 +1,111 @@
+<aside
+  class="w-[70%] md:w-[250px] z-[100] h-screen p-4 bg-primary shadow-sm duration-300 fixed top-0 left-[-100%] md:left-0 md:relative"
+  id="sidebar"
+>
+  <div
+    class="px-4 pb-4 flex items-center justify-between border-b border-gray-50/20"
+  >
+    {% include "partials/logo.light.html" %}
+
+    <button
+      id="sidebarcollapsbtn"
+      class="bg-gray-100 md:hidden flex items-center justify-center ring-4 ring-white w-[25px] h-[25px] rounded-full"
+    >
+      <i class="ri-arrow-left-s-line text-2xl text-dark"></i>
+    </button>
+  </div>
+
+  <!-- menu -->
+  <div class="my-3">
+    <ul class="flex flex-col gap-y-3">
+      <li
+        class="{%if request.endpoint == 'admin.dashboard'%}bg-white text-dark {%else%}bg-transparent text-white {%endif%} px-3 py-2 rounded-xl flex items-center gap-x-3 hover:bg-white/20 duration-300"
+      >
+        <i class="ri-dashboard-horizontal-line text-base mb-[2px]"></i>
+        <a
+          href="{{ url_for('admin.dashboard') }}"
+          class="flex items-center font-semibold text-base"
+        >
+          <p>Dashboard</p>
+        </a>
+      </li>
+      <li
+        class="{%if request.endpoint == 'admin.servres'%}bg-white text-dark {%else%}bg-transparent text-white {%endif%} px-3 py-2 rounded-xl flex items-center gap-x-3 hover:bg-white/20 duration-300"
+      >
+        <i class="ri-server-line text-base mb-[2px]"></i>
+        <a
+          href="{{url_for('admin.servres')}}"
+          class="flex items-center font-semibold text-base"
+        >
+          <p>Server</p>
+        </a>
+      </li>
+      <li
+        class="{%if request.endpoint == 'admin.services'%}bg-white text-dark {%else%}bg-transparent text-white {%endif%} px-3 py-2 rounded-xl flex items-center gap-x-3 hover:bg-white/20 duration-300"
+      >
+        <i class="ri-message-3-line text-base mb-[2px]"></i>
+        <a
+          href="{{url_for('admin.services')}}"
+          class="flex items-center font-semibold text-base"
+        >
+          <p>Services</p>
+        </a>
+      </li>
+      <li
+        class="{%if request.endpoint == 'admin.reviews'%}bg-white text-dark {%else%}bg-transparent text-white {%endif%} px-3 py-2 rounded-xl flex items-center gap-x-3 hover:bg-white/20 duration-300"
+      >
+        <i class="ri-shield-star-line text-base mb-[2px]"></i>
+        <a
+          href="{{url_for('admin.reviews')}}"
+          class="flex items-center font-semibold text-base"
+        >
+          <p>Reviews</p>
+        </a>
+      </li>
+      <li
+        class="{%if request.endpoint == 'admin.users'%}bg-white text-dark {%else%}bg-transparent text-white {%endif%} px-3 py-2 rounded-xl flex items-center gap-x-3 hover:bg-white/20 duration-300"
+      >
+        <i class="ri-user-line text-base mb-[2px]"></i>
+        <a
+          href="{{url_for('admin.users')}}"
+          class="flex items-center font-semibold text-base"
+        >
+          <p>Users</p>
+        </a>
+      </li>
+      <li
+        class="{%if request.endpoint == 'admin.transaction'%}bg-white text-dark {%else%}bg-transparent text-white {%endif%} px-3 py-2 rounded-xl flex items-center gap-x-3 hover:bg-white/20 duration-300"
+      >
+        <i class="ri-exchange-dollar-line text-base mb-[2px]"></i>
+        <a
+          href="{{url_for('admin.transaction')}}"
+          class="flex items-center font-semibold text-base"
+        >
+          <p>Transaction</p>
+        </a>
+      </li>
+      <li
+        class="{%if request.endpoint == 'admin.verifications'%}bg-white text-dark {%else%}bg-transparent text-white {%endif%} px-3 py-2 rounded-xl flex items-center gap-x-3 hover:bg-white/20 duration-300"
+      >
+        <i class="ri-chat-private-line text-base mb-[2px]"></i>
+        <a
+          href="{{url_for('admin.verifications')}}"
+          class="flex items-center font-semibold text-base"
+        >
+          <p>Verifications</p>
+        </a>
+      </li>
+      <li
+        class="{%if request.endpoint == 'admin.support'%}bg-white text-dark {%else%}bg-transparent text-white {%endif%} px-3 py-2 rounded-xl flex items-center gap-x-3 hover:bg-white/20 duration-300"
+      >
+        <i class="ri-question-line text-base mb-[2px]"></i>
+        <a
+          href="{{url_for('admin.support')}}"
+          class="flex items-center font-semibold text-base"
+        >
+          <p>Support</p>
+        </a>
+      </li>
+    </ul>
+  </div>
+</aside>

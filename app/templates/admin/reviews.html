@@ -1,0 +1,100 @@
+{% extends "admin/layout.html" %}
+
+<!-- page title -->
+{% block title %}Reviews{% endblock %} {%block content %}
+
+<!-- data table -->
+<div class="bg-white p-5 rounded-md overflow-x-auto">
+  <div class="mb-3">{%include 'partials/alert.html'%}</div>
+
+  <!-- page header -->
+  {% from '/admin/components/page_header.html' import header %} {{
+  header("Reviews") }}
+
+  <table id="example" class="display min-w-full">
+    <thead>
+      <tr class="bg-primary text-white h-[50px]">
+        <th class="p-0 text-left">Name</th>
+        <th class="p-0 text-left">User_id</th>
+        <th class="p-0 text-left">Rating</th>
+        <th class="p-0 text-left">Message</th>
+        <th class="p-0 text-left">Feture</th>
+        <th class="p-0 text-left">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {%if data.get('status') =='success' %} {% for user in data.get('data', [])
+      %}
+      <tr
+        class="h-[60px] border-b duration-300 hover:bg-gray-50 border-gray-100"
+      >
+        <td>
+          <div>
+            <h1>{{ user.get('user_name') }}</h1>
+            <small>{{ user.get('ocopation') }}</small>
+          </div>
+        </td>
+        <td>#{{ user.get('user_id') }}</td>
+        <td>
+          <i class="ri-star-fill text-yellow-400"></i> {{ user.get('rating') }}
+        </td>
+        <td>
+          <p>{{ user.get('message') }}</p>
+        </td>
+        <td>
+          <button
+            data-id="{{ user.get('id') }}"
+            onclick="changefeture(this)"
+            class="text-yellow-400"
+          >
+            <i
+              class="{{ 'ri-star-line' if user.get('feture') == 'off' else 'ri-star-fill' }} text-yellow-400 text-lg"
+            ></i>
+          </button>
+        </td>
+        <td>
+          <div class="flex items-center gap-x-3">
+            <a
+              href="{{url_for('admin.reviews', id=user.get('id'), order='delete')}}"
+              class="text-red-500 ml-2 flex items-center gap-x-1"
+              ><i class="ri-delete-bin-line mb-1"></i>Delete</a
+            >
+          </div>
+        </td>
+      </tr>
+      {% endfor %} {%endif%}
+    </tbody>
+  </table>
+</div>
+
+<!-- model -->
+{%include '/admin/components/emialreply.mode.html'%} {% endblock %}
+
+<!-- page scripts -->
+{%block page_script%}
+<script>
+  async function changefeture(e) {
+    const id = e.getAttribute("data-id");
+    if (id) {
+      const url = "{{url_for('admin.reviewfeture')}}";
+      const payload = { id: id };
+      const data = await httpRequest(url, "POST", payload);
+      if (data.status == "success") {
+        if (data.data == "on") {
+          e.querySelector("i").classList.remove("ri-star-line");
+          e.querySelector("i").classList.add("ri-star-fill");
+        } else {
+          e.querySelector("i").classList.remove("ri-star-fill");
+          e.querySelector("i").classList.add("ri-star-line");
+        }
+        toastr.success(data.message);
+      } else {
+        toastr.error(data.message);
+      }
+    } else {
+      toastr.error("Somthing else worng. reload the page and try again!");
+    }
+  }
+</script>
+{%endblock%}

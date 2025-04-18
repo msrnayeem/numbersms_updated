@@ -1,0 +1,66 @@
+<section class="pt-[50px] pb-4 bg-primary relative overflow-hidden z-[1]">
+  <img
+    src="{{url_for('static', filename='media/getstartbg.svg')}}"
+    class="absolute inset-0 min-w-full min-h-full object-cover z-[-1] opacity-20"
+  />
+  <div class="container">
+    <div class="flex flex-col md:flex-row items-center justify-between">
+      {%include 'partials/logo.light.html'%}
+
+      <ul class="items-center gap-6 flex mt-5 md:mt-0">
+        <li data-aos="zoom-in">
+          <a
+            href="/"
+            class="text-base text-white opacity-70 {%if request.endpoint == 'landing.dashboard'%} font-semibold opacity-100{%endif%} duration-300 hover:font-semibold"
+            >Home</a
+          >
+        </li>
+        <li data-aos="zoom-in">
+          <a
+            href="{{url_for('landing.about')}}"
+            class="text-base text-white opacity-70 font-medium {%if request.endpoint == 'landing.about'%} font-semibold opacity-100{%endif%} duration-300 hover:font-semibold"
+            >About</a
+          >
+        </li>
+        <li data-aos="zoom-in">
+          <a
+            href="{{url_for('landing.contact')}}"
+            class="text-base text-white opacity-70 font-medium {%if request.endpoint == 'landing.contact'%} font-semibold opacity-100{%endif%} duration-300 hover:font-semibold"
+            >Contact</a
+          >
+        </li>
+        {%if auth_data.get('auth') != True %}
+        <li data-aos="zoom-in">
+          <a
+            href="{{url_for('landing.signin')}}"
+            class="text-base text-white opacity-70 font-medium {%if request.endpoint == 'landing.signin'%} font-semibold opacity-100{%endif%} duration-300 hover:font-semibold"
+            >Login</a
+          >
+        </li>
+        {%endif%}
+      </ul>
+    </div>
+    <div class="bg-gray-200 w-full h-[1px] my-10"></div>
+    <div class="flex flex-col-reverse md:flex-row items-center justify-between">
+      <p class="text-white text-base mt-5 md:mt-0">
+        Copyright ©2025 numbersms.com
+      </p>
+      <ul class="flex items-center gap-3">
+        <li>
+          <a href=""
+            ><i
+              class="ri-facebook-fill w-[40px] h-[40px] flex items-center justify-center text-lg bg-gray-100 rounded-full duration-300 hover:text-primary"
+            ></i
+          ></a>
+        </li>
+        <li>
+          <a href=""
+            ><i
+              class="ri-instagram-line w-[40px] h-[40px] flex items-center justify-center text-lg bg-gray-100 rounded-full duration-300 hover:text-primary"
+            ></i
+          ></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>

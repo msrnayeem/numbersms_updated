@@ -1,0 +1,17 @@
+{
+  "name": "numbersms",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx tailwindcss -i ./app/static/css/tailwind.css -o ./app/static/css/output.css --watch",
+    "build": "npx tailwindcss -i ./app/static/css/tailwind.css -o ./app/static/css/output.css --minify"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

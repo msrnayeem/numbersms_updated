@@ -1,0 +1,17 @@
+{% extends "layout.html" %}{% block body %}
+<main class="w-full h-screen overflow-y-hidden flex">
+  <!-- sidebar -->
+  {% include "users/parts/sidebar.html" %}
+  <!-- content -->
+  <section
+    class="w-full md:w-[calc(100%-250px)] h-screen bg-gray-100"
+    id="dashcontent"
+  >
+    {% include "users/parts/navbar.html" %}
+    <div class="w-full h-screen p-4 md:p-4 pb-28 overflow-y-auto">
+      {%block content%}{%endblock%}
+    </div>
+  </section>
+</main>
+<!-- deposit fund model -->
+{%include '/users/components/deposit.model.html'%} {%endblock%}

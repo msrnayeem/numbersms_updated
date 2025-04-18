@@ -1,0 +1,87 @@
+{% extends "landing/layout.html" %} {%block title%}Contact page{%endblock%} {%
+block main %}
+<section class="py-[100px] bg-bg">
+  <div class="container">
+    <div class="flex flex-col items-center justify-center gap-y-2">
+      <p
+        class="text-primary font-semibold text-center text-sm uppercase"
+        data-aos="fade-up"
+      >
+        contact
+      </p>
+      <h1
+        data-aos="fade-up"
+        class="text-3xl font-semibold text-dark text-center"
+      >
+        Book a free demo
+      </h1>
+      <p
+        data-aos="fade-up"
+        class="text-center text-base text-gray-600 mt-2 w-full md:w-[50%] mx-auto"
+      >
+        We offer flexible pricing plans to keep your number private while
+        staying connected. Choose the plan that best suits your needs and enjoy
+        seamless communication.
+      </p>
+    </div>
+
+    <div
+      class="bg-white w-full md:w-[550px] mx-auto mt-10 rounded-lg p-7 shadow-lg shadow-secondary/20"
+    >
+      <h2 class="text-lg font-semibold text-dark" data-aos="fade-up">
+        Get started with Numbersms
+      </h2>
+      <p class="text-sm text-gray-600 mt-1" data-aos="fade-up">
+        Fill in the form below to get started with our service.
+      </p>
+
+      <form
+        action="{{url_for('landing.contact')}}"
+        class="mt-7 flex flex-col gap-3"
+        method="post"
+      >
+        <div class="mb-3">{%include 'partials/alert.html'%}</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div data-aos="zoom-in">
+            <label class="text-sm font-medium text-dark uppercase"
+              >FIRST NAME<span class="text-red-500">*</span></label
+            >
+            <input type="text" name="f_name" class="custome-input" required />
+          </div>
+          <div data-aos="zoom-in">
+            <label class="text-sm font-medium text-dark uppercase"
+              >last NAME<span class="text-red-500">*</span></label
+            >
+            <input type="text" name="l_name" class="custome-input" required />
+          </div>
+        </div>
+        <div data-aos="zoom-in">
+          <label class="text-sm font-medium text-dark uppercase"
+            >email<span class="text-red-500">*</span></label
+          >
+          <input type="email" name="email" class="custome-input" required />
+        </div>
+        <div data-aos="zoom-in">
+          <label class="text-sm font-medium text-dark uppercase">phone</label>
+          <input type="text" name="phone" class="custome-input" />
+        </div>
+        <div data-aos="zoom-in">
+          <label class="text-sm font-medium text-dark uppercase"
+            >Message<span class="text-red-500">*</span></label
+          >
+          <textarea
+            name="message"
+            class="custome-input h-[150px] rounded-xl"
+          ></textarea>
+        </div>
+        <button
+          data-aos="fade-up"
+          class="py-2 px-4 mt-3 rounded-full w-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium"
+        >
+          Send now
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+{%endblock%}

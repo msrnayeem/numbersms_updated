@@ -1,0 +1,233 @@
+{% extends "admin/layout.html" %}
+
+<!-- page title -->
+{% block title %}Servers{% endblock %} {%block content %}
+
+<!-- table -->
+<div class="bg-white p-5 rounded-md overflow-x-auto">
+  <div class="mb-3">{%include 'partials/alert.html'%}</div>
+  <!-- page header -->
+  {% from '/admin/components/page_header.html' import header %} {% set
+  new_server_button %}
+  <button onclick="modelhandler('server_model')" class="btn">
+    <i class="ri-add-line"></i> New Server
+  </button>
+  {% endset %} {{ header("Servers", new_server_button) }}
+
+  <table id="example" class="display min-w-full">
+    <thead>
+      <tr class="bg-primary text-white h-[50px]">
+        <th class="p-0 text-left">Name</th>
+        <th class="p-0 text-left">Credits</th>
+        <th class="p-0 text-left">Status</th>
+        <th class="p-0 text-left">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {%if data.get('status') =='success' %} {% for user in data.get('data', [])
+      %}
+      <tr
+        class="h-[60px] border-b duration-300 hover:bg-gray-50 border-gray-100"
+      >
+        <td>{{ user.get('server_name') }}</td>
+        <td>
+          <div class="flex flex-col">
+            <span class="text-base font-medium">{{ user.get('email') }}</span>
+            <span class="text-sm text-primary"
+              >{{ user.get('api')[:20] }}...</span
+            >
+          </div>
+        </td>
+        <td>
+          <div class="flex items-center gap-x-2">
+            <span class="flex items-center gap-x-1">
+              {%if user.get('status') == 'on'%}
+              <i class="ri-checkbox-circle-line text-green-400"></i>
+              {%else%}
+              <i class="ri-close-circle-line text-red-400"></i>
+              {%endif%} {{ user.get('status') }}
+            </span>
+
+            <div class="flex items-center">
+              <input type="checkbox" onchange="statuschange(this)" data-id="{{
+              user.get('id') }}" id="{{ user.get('id') }}" class="hidden" {% if
+              user.get('status') == 'on' %}checked{% endif %}>
+              <label
+                for="{{ user.get('id') }}"
+                id="slider"
+                class="relative mr-4 w-8 h-4 rounded-full bg-red-600 cursor-pointer"
+              ></label>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="flex items-center gap-x-3">
+            <a
+              href="javascript:void(0);"
+              data-id="{{user.get('id')}}"
+              onclick="edit(this)"
+              class="text-blue-500 flex items-center gap-x-1"
+              ><i class="ri-pencil-line mb-1"></i>Edit</a
+            >
+            <a
+              href="{{url_for('admin.servres', id=user.get('id'), order='delete')}}"
+              class="text-red-500 flex items-center"
+              ><i class="ri-delete-bin-line mb-1"></i>Delete</a
+            >
+          </div>
+        </td>
+      </tr>
+      {% endfor %} {%endif%}
+    </tbody>
+  </table>
+</div>
+
+<!-- add model -->
+{%include '/admin/components/servremode.add.html'%}
+
+<!-- edit model -->
+{%include '/admin/components/servermode.edit.html'%} {% endblock %}
+
+<!-- page scripts -->
+{%block page_script%}
+<script>
+  // edit data load
+  const editurl = "{{url_for('admin.serverdata')}}";
+  async function edit(e) {
+    let id = e.getAttribute("data-id");
+
+    if (id) {
+      let payload = { id: id };
+      let data = await httpRequest(editurl, "POST", payload);
+      if (data.status == "success") {
+        if (data.data.data) {
+          let res = data.data.data;
+          let edit_name = document.getElementById("edit_name");
+          let edit_email = document.getElementById("edit_email");
+          let edit_api = document.getElementById("edit_api");
+          let edit_id = document.getElementById("edit_id");
+          edit_id.value = res.id;
+          edit_name.value = res.server_name;
+          edit_email.value = res.email;
+          edit_api.value = res.api;
+          modelhandler("server_edit_model");
+        }
+      } else {
+        toastr.error(data.message);
+      }
+    } else {
+      toastr.error("Something else wrong. refresh the page and try again!");
+    }
+  }
+
+  // edit
+  const editupdateurl = "{{url_for('admin.serveredit')}}";
+  document
+    .getElementById("editserverbtn")
+    .addEventListener("click", async function () {
+      this.disabled = true;
+      this.innerHTML = "Proccesing..";
+      const id = document.getElementById("edit_id");
+      const name = document.getElementById("edit_name");
+      const email = document.getElementById("edit_email");
+      const api = document.getElementById("edit_api");
+
+      if (name.value == "") {
+        name.style.borderColor = "red";
+      } else {
+        name.removeAttribute("style");
+      }
+      if (email.value == "") {
+        email.style.borderColor = "red";
+      } else {
+        email.removeAttribute("style");
+      }
+      if (api.value == "") {
+        api.style.borderColor = "red";
+      } else {
+        api.removeAttribute("style");
+      }
+
+      let payload = {
+        id: id.value,
+        name: name.value,
+        email: email.value,
+        api: api.value,
+      };
+      let data = await httpRequest(editupdateurl, "POST", payload);
+      if (data.status == "success") {
+        name.value = "";
+        email.value = "";
+        api.value = "";
+        toastr.success(data.message);
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        toastr.error(data.message);
+        this.disabled = false;
+        this.innerHTML = "Update now";
+      }
+    });
+
+  // changes status
+  const statuschangeurl = '{{url_for("admin.serverstatus")}}';
+  async function statuschange(e) {
+    let id = e.getAttribute("data-id");
+    let payload = { id: id };
+    let data = await httpRequest(statuschangeurl, "POST", payload);
+    if (data.status == "success") {
+      toastr.success(data.message + " Please wait page refreshing");
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } else {
+      toastr.error(data.message);
+    }
+  }
+
+  const url = "{{url_for('admin.servres')}}";
+  // server create
+  document
+    .getElementById("addserverbtn")
+    .addEventListener("click", async function () {
+      const name = document.getElementById("name");
+      const email = document.getElementById("email");
+      const api = document.getElementById("api");
+      this.disabled = true;
+      this.innerHTML = "Proccesing..";
+
+      if (name.value == "") {
+        name.style.borderColor = "red";
+      } else {
+        name.removeAttribute("style");
+      }
+      if (email.value == "") {
+        email.style.borderColor = "red";
+      } else {
+        email.removeAttribute("style");
+      }
+      if (api.value == "") {
+        api.style.borderColor = "red";
+      } else {
+        api.removeAttribute("style");
+      }
+
+      let payload = { name: name.value, email: email.value, api: api.value };
+      let data = await httpRequest(url, "POST", payload);
+      if (data.status == "success") {
+        name.value = "";
+        email.value = "";
+        api.value = "";
+        toastr.success(data.message + " Please wait page refreshing");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        toastr.error(data.message);
+        this.disabled = false;
+        this.innerHTML = "Add now";
+      }
+    });
+</script>
+{%endblock%}

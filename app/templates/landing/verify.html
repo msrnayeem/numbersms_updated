@@ -1,0 +1,45 @@
+{% extends "landing/layout.auth.html" %} {%block title%}Verify
+account{%endblock%} {% block auth %}
+<div class="p-7">
+  <h1 class="text-dark font-bold text-2xl" data-aos="fade-up">
+    Verify your email
+  </h1>
+
+  <form
+    action="{{url_for('landing.verify')}}"
+    method="post"
+    class="mt-10 flex flex-col gap-3"
+  >
+    {%include 'partials/alert.html'%}
+
+    <div data-aos="zoom-in">
+      <label class="text-sm font-medium text-dark uppercase"
+        >Verify code<span class="text-red-500">*</span></label
+      >
+      <input type="text" name="code" class="custome-input" required />
+    </div>
+    <div class="flex items-center justify-end">
+      <a
+        class="text-sm font-normal text-gray-400 flex items-center gap-1"
+        href="{{url_for('landing.resendcode')}}"
+        ><i class="ri-refresh-line mb-[2px]"></i> Resend code</a
+      >
+    </div>
+    <button
+      data-aos="fade-up"
+      class="py-2 px-4 mt-3 rounded-full w-full group bg-dark shadow-md duration-500 shadow-secondary hover:bg-opacity-90 text-white text-sm capitalize font-medium"
+    >
+      Verify now
+    </button>
+  </form>
+</div>
+<p
+  data-aos="zoom-in"
+  class="mt-5 text-sm text-gray-500 bg-gray-100 w-full h-[60px] flex items-center justify-center rounded-md"
+>
+  If you want to exit,
+  <a href="{{url_for('landing.logout')}}" class="text-primary underline"
+    >logout</a
+  >
+</p>
+{%endblock%}

@@ -1,0 +1,235 @@
+{% extends "admin/layout.html" %}
+
+<!-- page title -->
+{% block title %}Users{% endblock %} {%block content %}
+
+<!-- data table -->
+<div class="bg-white p-5 rounded-md overflow-x-auto">
+  <!-- page header -->
+  {% from '/admin/components/page_header.html' import header %}{% set
+  new_server_button %}
+  <button onclick='modelhandler("user_edit_model")' class="btn">
+    <i class="ri-add-line"></i> Add User
+  </button>
+  {% endset %} {{ header("Users", new_server_button) }}
+
+  <div class="mb-3">{%include 'partials/alert.html'%}</div>
+  <table id="example" class="display min-w-full">
+    <thead>
+      <tr class="bg-primary text-white h-[50px]">
+        <th class="p-0 text-left">User ID</th>
+        <th class="p-0 text-left">Name</th>
+        <th class="p-0 text-left">Balance</th>
+        <th class="p-0 text-left">Role</th>
+        <th class="p-0 text-left">Status</th>
+        <th class="p-0 text-left">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {%if data.get('status') =='success' %} {% for user in data.get('data', [])
+      %}
+      <tr
+        class="h-[60px] border-b duration-300 hover:bg-gray-50 border-gray-100"
+      >
+        <td>
+          <span class="select-none text-gray-500">#</span> {{ user.get('id') }}
+        </td>
+        <td>
+          <div class="flex flex-col">
+            <span class="text-base font-medium">{{ user.get('name') }}</span>
+            <span class="text-sm underline text-primary"
+              ><a href="mailto:{{ user[2] }}">{{ user.get('email') }}</a></span
+            >
+          </div>
+        </td>
+        <td>
+          {{ '--' if user.get('role') == 'admin' else '$' +
+          "{:.1f}".format(user.get('coin')) }}
+        </td>
+        <td>
+          <span
+            class="bg-primary bg-opacity-20 rounded-lg text-sm text-center px-2"
+            >{{ user.get('role') }}</span
+          >
+        </td>
+        <td>
+          <span class="flex items-center gap-x-1">
+            {%if user.get('status') == 'good'%}
+            <i class="ri-checkbox-circle-line text-green-400"></i>
+            {%else%}
+            <i class="ri-close-circle-line text-red-400"></i>
+            {%endif%} {{ user.get('status') }}
+          </span>
+        </td>
+        <td>
+          <div class="flex items-center gap-x-3">
+            {%if not auth_data.get('data').get('id') == user.get('id')%}
+            <a
+              href="javascript:void(0);"
+              onclick="addfoundmodel(this)"
+              data-id="{{user.get('id')}}"
+              class="text-blue-500 flex items-center gap-x-1"
+              ><i class="ri-add-circle-line"></i>Add fund</a
+            >
+            <a
+              href="javascript:void(0);"
+              onclick="edituser(this)"
+              data-id="{{user.get('id')}}"
+              class="text-blue-500 flex items-center gap-x-1"
+              ><i class="ri-pencil-line mb-1"></i>Edit</a
+            >
+            <a
+              href="{{url_for('admin.users', id=user.get('id'), order='delete')}}"
+              class="text-red-500 flex items-center"
+              ><i class="ri-delete-bin-line mb-1"></i>Delete</a
+            >
+            {%else%}
+            <p class="text-gray-500 text-sm font-semibold">This you</p>
+            {%endif%}
+          </div>
+        </td>
+      </tr>
+      {% endfor %} {%endif%}
+    </tbody>
+  </table>
+</div>
+
+<!-- model -->
+{%include '/admin/components/usereditmodel.html'%}
+
+<!-- add found -->
+{%include '/admin/components/addfound.html'%} {% endblock %}
+
+<!-- page scripts -->
+{%block page_script%}
+<script>
+  // edit user
+  let usersdataurl = '{{url_for("admin.userdata")}}';
+  async function edituser(e) {
+    let id = e.getAttribute("data-id");
+    let payload = { id: id };
+
+    let data = await httpRequest(usersdataurl, "POST", payload);
+    if (data.status == "success") {
+      let res = data.data.data;
+      if (res) {
+        document.getElementById("id").value = res.id;
+        document.getElementById("user_name").innerHTML = "- " + res.name;
+        document.getElementById("title").innerHTML = "Update";
+        document.getElementById("passbox").classList.add("hidden");
+        document.getElementById("name").value = res.name;
+        document.getElementById("email").value = res.email;
+
+        document.getElementById("email_status").value = res.email_verify;
+        document.getElementById("status").value = res.status;
+        document.getElementById("role").value = res.role;
+
+        modelhandler("user_edit_model");
+      } else {
+        toastr.error(data.message);
+      }
+    } else {
+      toastr.error(data.message);
+    }
+  }
+
+  // update
+  let usersupdateurl = '{{url_for("admin.userupdate")}}';
+  document
+    .getElementById("updateuserbtn")
+    .addEventListener("click", async function () {
+      this.disabled = true;
+      this.innerHTML = "Proccesing..";
+
+      let payload = {
+        id: document.getElementById("id").value,
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+        email_status: document.getElementById("email_status").value,
+        status: document.getElementById("status").value,
+        role: document.getElementById("role").value,
+      };
+      let data = await httpRequest(usersupdateurl, "POST", payload);
+      if (data.status == "success") {
+        window.location.reload();
+      } else {
+        toastr.error(data.message);
+      }
+    });
+
+  // add found
+  const addfoundurl = "{{url_for('admin.foundadd')}}";
+  function addfoundmodel(e) {
+    let user_id = (document.getElementById("user_id").value =
+      e.getAttribute("data-id"));
+    modelhandler("addfound");
+  }
+
+  document
+    .getElementById("verify_button")
+    .addEventListener("click", async function () {
+      this.disabled = true;
+      this.innerHTML = "Finding..";
+      let user_id = document.getElementById("user_id").value;
+      if (user_id != "") {
+        let verify_box = document.getElementById("verify_box");
+        let v_name = document.getElementById("v_name");
+        let v_email = document.getElementById("v_email");
+
+        let payload = { id: user_id };
+        let data = await httpRequest(usersdataurl, "POST", payload);
+
+        if (data.status == "success" && data.data !== null) {
+          let res = data.data.data;
+          v_name.innerHTML = res.name;
+          v_email.innerHTML = res.email;
+          verify_box.classList.remove("hidden");
+          this.disabled = false;
+          this.innerHTML = "Verify";
+        } else {
+          this.disabled = false;
+          this.innerHTML = "Verify";
+          toastr.error("Invalid ID/Email");
+        }
+      } else {
+        this.disabled = false;
+        this.innerHTML = "Verify";
+      }
+    });
+
+  document
+    .getElementById("addfoundbtn")
+    .addEventListener("click", async function () {
+      this.disabled = true;
+      this.innerHTML = "Proccesing..";
+      let user_id = document.getElementById("user_id");
+      let amount = document.getElementById("amount");
+      let sender = "admin";
+
+      if (user_id.value != "" || amount.value !== "") {
+        let payload = {
+          id: user_id.value,
+          amount: amount.value,
+          sender: sender,
+        };
+        let data = await httpRequest(addfoundurl, "POST", payload);
+        if (data.status == "success") {
+          this.disabled = false;
+          this.innerHTML = "Add now";
+
+          toastr.success(data.message + " Please wait, page refreshing");
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        } else {
+          this.disabled = false;
+          this.innerHTML = "Add now";
+          toastr.error(data.message);
+        }
+      } else {
+        toastr.error("All fild are required");
+      }
+    });
+</script>
+{%endblock%}

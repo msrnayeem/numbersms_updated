@@ -1,0 +1,68 @@
+{% extends "admin/layout.html" %}
+
+<!-- page title -->
+{% block title %}verifications{% endblock %} {%block content %}
+
+<!-- data table -->
+<div class="bg-white p-5 rounded-md overflow-x-auto">
+  <div class="mb-3">{%include 'partials/alert.html'%}</div>
+
+  <!-- page header -->
+  {% from '/admin/components/page_header.html' import header %} {{
+  header("Verifications") }}
+
+  <table id="example" class="display min-w-full">
+    <thead>
+      <tr class="bg-dark uppercase text-white h-[50px]">
+        <th class="p-0 text-left">Serice</th>
+        <th class="p-0 text-left">Server ID</th>
+        <th class="p-0 text-left">User ID</th>
+        <th class="p-0 text-left">Price</th>
+        <th class="p-0 text-left">Number</th>
+        <th class="p-0 text-left">Otp</th>
+        <th class="p-0 text-left">Status</th>
+        <th class="p-0 text-left">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody id="verification_tale_body">
+      {%if data.get('status') =='success' %} {% for user in data.get('data', [])
+      %}
+      <tr
+        class="h-[60px] border-b duration-300 hover:bg-gray-50 border-gray-100"
+      >
+        <td>{{ user.get('service_name') }}</td>
+        <td>{{ user.get('server_id') }}</td>
+        <td>#{{ user.get('user_id') }}</td>
+        <td>${{ user.get('price') }}</td>
+        <td>{{ user.get('number') }}</td>
+        <td>{{ user.get('opt') }}</td>
+        <td>
+          {%if user.get('status') =='pending'%}
+          <span
+            class="font-bold text-yellow-500 bg-yellow-50 rounded-lg px-2 py-1 capitalize"
+            >{{user.get('status')}}</span
+          >
+          {%elif user.get('status') =='complete'%}
+          <span
+            class="font-bold text-green-500 bg-green-50 rounded-lg px-2 py-1 capitalize"
+            >{{user.get('status')}}</span
+          >
+          {%else%}
+          <span
+            class="font-bold text-red-500 bg-red-50 rounded-lg px-2 py-1 capitalize"
+            >{{user.get('status')}}</span
+          >
+          {%endif%}
+        </td>
+        <td>
+          <a href="{{url_for('admin.verifications', id=user.get('id'), order='delete')}}" class="text-red-500 ml-2 flex items-center gap-x-1">
+            <i class="ri-delete-bin-line mb-1"></i>Delete
+          </a>
+        </td>
+      </tr>
+      {% endfor %} {%endif%}
+    </tbody>
+  </table>
+</div>
+{%endblock%}

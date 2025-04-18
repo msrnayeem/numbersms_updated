@@ -1,0 +1,54 @@
+<div
+  id="addfound"
+  class="fixed pointer-events-none opacity-0 duration-300 inset-0 z-[999] w-full h-screen bg-dark/20 backdrop-blur-md flex items-center justify-center"
+>
+  <div
+    id="model_body"
+    class="bg-white duration-300 scale-50 opacity-0 pointer-events-none rounded-md p-5 border border-gray-100 w-[90%] md:w-[600px]"
+  >
+    <header
+      class="flex items-center justify-between border-b border-gray-200 pb-5"
+    >
+      <h1 class="text-dark text-lg font-semibold">Add fund</h1>
+      <button onclick="modelhandler('addfound')" class="btn">
+        <i class="ri-close-large-fill"></i>
+      </button>
+    </header>
+
+    <div class="mt-5">
+      <div>
+        <label class="text-sm font-medium text-dark uppercase"
+          >ID/Email<span class="text-red-500">*</span></label
+        >
+        <input
+          type="text"
+          id="user_id"
+          name="user_id"
+          class="custome-input"
+          required
+        />
+        <p class="mt-1 text-gray-500">Before add money please <button id="verify_button" class="underline text-primary">Verify</button></p>
+      </div>
+      <div class="mt-3">
+        <label class="text-sm font-medium text-dark uppercase"
+          >Amount<span class="text-red-500">*</span></label
+        >
+        <input
+          type="number"
+          id="amount"
+          name="amount"
+          class="custome-input"
+          required
+        />
+      </div>
+
+      <div class="border border-gray-200 rounded-md p-3 mt-3 hidden" id="verify_box">
+        <h2 class="text-lg font-semibold text-dark" id="v_name"></h2>
+        <p class="text-base text-dark" id="v_email"></p>
+      </div>
+
+        <button class="btn mt-3" id="addfoundbtn">Add now</button>
+      </div>
+    </div>
+  </div>
+</div>

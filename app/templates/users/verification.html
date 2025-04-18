@@ -1,0 +1,199 @@
+{% extends "users/layout.html" %} {% block title %}Verification{% endblock %}
+{%block content %}
+
+<div class="bg-white p-7 rounded-md overflow-x-auto">
+  <div
+    class="flex flex-col md:flex-row gap-y-4 md:gap-y-0 items-center justify-between mb-10 border-b border-gray-100 pb-7"
+  >
+    <h1 class="text-dark text-2xl capitalize font-bold">Verification</h1>
+
+    <div class="flex items-center overflow-hidden btn p-0 m-0 gap-0">
+      <button id="serviceLoadbtn" onclick="load()" class="btn">
+        <i class="ri-add-large-line"></i>Create Verification
+      </button>
+      <button
+        class="btn border-l border-gray-100 rounded-none"
+        onclick="loadservers(this)"
+      >
+        <i class="ri-settings-2-line"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="mb-3">{%include 'partials/alert.html'%}</div>
+  <table id="example" class="display min-w-full">
+    <thead>
+      <tr class="bg-dark uppercase text-white h-[50px]">
+        <th class="p-0 text-left">Serice</th>
+        <th class="p-0 text-left">Price</th>
+        <th class="p-0 text-left">Number</th>
+        <th class="p-0 text-left">Otp</th>
+        <th class="p-0 text-left">Server ID</th>
+        <th class="p-0 text-left">Status</th>
+        <th class="p-0 text-left">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody id="verification_tale_body">
+      {%if data.get('status') =='success' %} {% for user in data.get('data', [])
+      %}
+      <tr
+        data-vid="{{user.get('service_token')}}"
+        data-id="{{user.get('id')}}"
+        data-status="{{user.get('status')}}"
+        class="h-[60px] border-b duration-300 hover:bg-gray-50 border-gray-100"
+      >
+        <td>{{ user.get('service_name') }}</td>
+        <td>${{ user.get('price') }}</td>
+        <td>{{ user.get('number') }}</td>
+        <td>{{ user.get('opt') }}</td>
+        <td>#{{ user.get('server_id') }}</td>
+        <td>
+          {%if user.get('status') =='pending'%}
+          <span
+            class="font-bold text-yellow-500 bg-yellow-50 rounded-lg px-2 py-1 capitalize"
+            >{{user.get('status')}}</span
+          >
+          {%elif user.get('status') =='complete'%}
+          <span
+            class="font-bold text-green-500 bg-green-50 rounded-lg px-2 py-1 capitalize"
+            >{{user.get('status')}}</span
+          >
+          {%else%}
+          <span
+            class="font-bold text-red-500 bg-red-50 rounded-lg px-2 py-1 capitalize"
+            >{{user.get('status')}}</span
+          >
+          {%endif%}
+        </td>
+        <td>
+          <div class="flex items-center gap-x-3">
+            {%if user.get('status') =='pending'%}
+            <button
+              data-id="{{user.get('id')}}"
+              onclick="openverify(this)"
+              class="text-blue-500 ml-2 flex items-center gap-x-1"
+            >
+              <i class="ri-eye-line mb-1"></i>Open
+            </button>
+            <button
+              data-id="{{user.get('id')}}"
+              data-order="table"
+              onclick="cancelservice(this)"
+              class="text-red-500 ml-2 flex items-center gap-x-1"
+            >
+              <i class="ri-delete-bin-line mb-1"></i>Cancel
+            </button>
+            {%else%} -- {%endif%}
+          </div>
+        </td>
+      </tr>
+      {% endfor %} {%endif%}
+    </tbody>
+  </table>
+</div>
+
+<!-- model -->
+{%include '/users/components/server.model.html' %} {%include
+'/users/components/verification.model.html' %} {%include
+'/users/components/otp.model.html' %} {% endblock %}
+<!-- page scripts -->
+{%block page_script%}
+<script>
+  const data_url = "{{url_for('api.getdata')}}";
+  async function openverify(e) {
+    const id = e.getAttribute("data-id");
+    if (id) {
+      let payload = { id: id };
+      let data = await httpRequest(data_url, "POST", payload);
+      if (data.status == "success") {
+        modelhandler("opt_model", loadveerifydata(data.data));
+      } else {
+        toastr.error(data.message);
+      }
+    } else {
+      toastr.error("Something wrong. Try again! Or reload the page.");
+    }
+  }
+
+  // cancel
+  async function cancelservice(e) {
+    e.disabled = true;
+    e.setAttribute("oldText", this.innerHTML);
+    e.innerHTML = `<i class="ri-loader-2-line animate-spin"></i>`;
+
+    const canceel_url = "{{url_for('api.cancel')}}";
+    let id = e.getAttribute("data-id");
+    let payload = { id: id };
+    let data = await httpRequest(canceel_url, "POST", payload);
+    if (data.status == "success" && data.data) {
+      let finnal_data_otp = data.data.data;
+      // update table
+      const row = document.querySelector(
+        `tr[data-vid="${finnal_data_otp.service_token}"]`
+      );
+      if (row) {
+        row.remove();
+      }
+      const html = `<tr data-vid="${
+        finnal_data_otp.service_token
+      }" class="h-[60px] border-b duration-300 hover:bg-gray-50 border-gray-100">
+              <td>${finnal_data_otp.service_name}</td>
+              <td>$${finnal_data_otp.price}</td>
+              <td>${finnal_data_otp.number}</td>
+              <td>${finnal_data_otp.opt ? finnal_data_otp.opt : "None"}</td>
+              <td>#${finnal_data_otp.server_id}</td>
+              <td>
+                <span
+                  class="font-bold ${
+                    finnal_data_otp.status === "pending"
+                      ? "text-yellow-500 bg-yellow-50"
+                      : "text-red-500 bg-red-50"
+                  } rounded-lg px-2 py-1 capitalize"
+                >
+                  ${finnal_data_otp.status}
+                </span>
+              </td>
+              <td>
+                <div class="flex items-center gap-x-3">
+                  ${
+                    finnal_data_otp.status === "pending"
+                      ? `
+                  <button
+                    data-id="${finnal_data_otp.id}"
+                    onclick="openverify(this)"
+                    class="text-blue-500 ml-2 flex items-center gap-x-1"
+                  >
+                    <i class="ri-eye-line mb-1"></i>Open
+                  </button>
+                  <button
+                   data-id="${finnal_data_otp.id}"
+                    onclick='cancelservice(this)'
+                    class="text-red-500 ml-2 flex items-center gap-x-1"
+                  >
+                    <i class="ri-delete-bin-line mb-1"></i>Cancel
+                  </button>`
+                      : "--"
+                  }
+                </div>
+              </td>
+            </tr>`;
+      verification_tale_body.insertAdjacentHTML("afterbegin", html);
+      toastr.success(data.message);
+      e.disabled = false;
+      e.innerHTML = e.getAttribute("oldText");
+      if (
+        e.getAttribute("data-order") &&
+        e.getAttribute("data-order") != "table"
+      ) {
+        modelhandler("opt_model", "", resetmodel());
+      }
+      console.log(datadone);
+    } else {
+      toastr.error(data.message);
+      e.disabled = false;
+      e.innerHTML = e.getAttribute("oldText");
+    }
+  }
+</script>
+{%endblock%}

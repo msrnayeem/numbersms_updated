@@ -1,0 +1,360 @@
+<div
+  id="verification_model"
+  class="fixed pointer-events-none opacity-0 duration-300 inset-0 z-[999] w-full h-screen bg-dark/20 backdrop-blur-md flex items-center justify-center"
+>
+  <div
+    id="model_body"
+    class="bg-white max-h-[90%] duration-300 scale-50 opacity-0 pointer-events-none rounded-md p-5 border border-gray-100 w-[90%] md:w-[550px]"
+  >
+    <header
+      class="flex items-center justify-between border-b border-gray-200 pb-5"
+    >
+      <h1 class="text-dark text-lg font-semibold">Create Verification</h1>
+      <button
+        onclick="modelhandler('verification_model', null, resetpreselectedserver())"
+        class="btn"
+      >
+        <i class="ri-close-large-fill"></i>
+      </button>
+    </header>
+
+    <div class="mt-3">
+      <input
+        type="text"
+        id="searchinput"
+        class="custome-input h-[42px]"
+        placeholder="Search.."
+      />
+    </div>
+
+    <div
+      class="mt-3 relative max-h-[250px] border border-gray-200 rounded-md p-3 overflow-y-auto overflow-x-hidden"
+    >
+      <div id="servicesbox"></div>
+      <div
+        id="loading"
+        class="hidden min-h-[200px] min-w-full bg-white/20 backdrop-blur-md items-center justify-center"
+      >
+        <i class="ri-loader-2-line animate-spin text-3xl"></i>
+      </div>
+    </div>
+    <p class="text-sm mt-3 text-gray-500">
+      <strong>NOTE: </strong>
+      You can create only one service at a time. After completing or canceling
+      the current service, you will be able to create a new one.
+    </p>
+    <button
+      class="btn h-[25px] text-[11px] border-l mt-1 border-gray-100"
+      onclick="loadservers(this, hideverifymodel())"
+    >
+      <i class="ri-restart-line"></i> Change default server
+    </button>
+  </div>
+</div>
+{%block page_script%}
+<script>
+  // load services model
+  const servicesbox = document.getElementById("servicesbox");
+  const verification_tale_body = document.getElementById(
+    "verification_tale_body"
+  );
+  async function load() {
+    let e = document.getElementById("serviceLoadbtn");
+
+    // check defult server added or not
+    const server_data = JSON.parse(localStorage.getItem("server_key")) || {};
+
+    if (server_data && server_data.server_id == null) {
+      if (!server_data.defualt && server_data.server_id != null) {
+        loadservers();
+        return;
+      } else if (server_data.server_id == null) {
+        loadservers();
+        return;
+      }
+    } else {
+      const validsever = await httpRequest(
+        "{{url_for('user.validserver')}}",
+        "POST",
+        { server_id: server_data.server_id }
+      );
+
+      if (validsever.status == "error") {
+        localStorage.setItem(
+          "server_key",
+          JSON.stringify({
+            defualt: false,
+            server_id: null,
+          })
+        );
+        loadservers();
+        return;
+      }
+    }
+
+    e.disabled = true;
+    e.setAttribute("oldText", e.innerHTML);
+    e.innerHTML = `<i class="ri-loader-2-line animate-spin"></i>`;
+
+    let pinnedServices =
+      JSON.parse(localStorage.getItem("pinnedServices")) || [];
+    let data = await httpRequest("{{url_for('user.servicesget')}}", "POST", {});
+
+    if (data.status == "success") {
+      const services_data = data.data.data;
+
+      // Sort services so pinned ones come first
+      services_data.sort((a, b) => {
+        const isPinnedA = pinnedServices.includes(a.id);
+        const isPinnedB = pinnedServices.includes(b.id);
+
+        // If a is pinned and b is not, a should come first
+        if (isPinnedA && !isPinnedB) return -1;
+        // If b is pinned and a is not, b should come first
+        if (!isPinnedA && isPinnedB) return 1;
+
+        return 0; // Keep their order if both are pinned or both are not
+      });
+
+      modelhandler("verification_model");
+      // Use DocumentFragment for better performance
+      servicesbox.innerHTML = ""; // Clear existing content
+      const fragment = document.createDocumentFragment();
+
+      services_data.forEach((ele) => {
+        const hasPinned = pinnedServices.includes(ele.id);
+
+        const button = document.createElement("button");
+        button.className =
+          "py-3 first:border-t first:border-gray-200 border-b border-gray-200 flex items-center justify-between gap-x-3 w-full duration-300 hover:bg-gray-50";
+        button.setAttribute("data-id", ele.id);
+        button.setAttribute("onclick", "createverification(this)");
+
+        button.innerHTML = `
+        <div class="flex items-center gap-x-2 w-1/2">
+          <img
+            src="${ele.image ? ele.image : "{{ get_media() }}"}"
+            class="w-[40px] h-[40px] p-2 rounded-full border border-gray-300 overflow-hidden"
+          />
+          <span class="text-gray-500 text-lg font-semibold">${
+            ele.custome_name || ele.service
+          }</span>
+        </div>
+        <div class="flex items-center justify-between gap-x-2 pr-3 pl-4 w-1/2">
+          <span class="font-semibold text-dark text-lg">$${
+            parseFloat(ele.selling_price).toFixed(2) ||
+            parseFloat(ele.price).toFixed(2)
+          }</span>
+          <i
+            onclick='pinservice(this, ${ele.id})'
+            class="${
+              hasPinned ? "ri-star-fill" : "ri-star-line"
+            } text-2xl text-yellow-400 w-[40px] h-[40px] flex items-center justify-center"
+          ></i>
+        </div>
+      `;
+        fragment.appendChild(button);
+      });
+
+      // Append all elements at once
+      servicesbox.appendChild(fragment);
+      e.disabled = false;
+      e.innerHTML = e.getAttribute("oldText");
+    } else {
+      toastr.error(data.message);
+      e.disabled = false;
+      e.innerHTML = e.getAttribute("oldText");
+    }
+  }
+
+  // service pin
+  function pinservice(e, id) {
+    let pinnedServices =
+      JSON.parse(localStorage.getItem("pinnedServices")) || [];
+
+    if (pinnedServices.includes(id)) {
+      // Remove from pinned list
+      pinnedServices = pinnedServices.filter((serviceId) => serviceId !== id);
+      e.classList.remove("ri-star-fill");
+      e.classList.add("ri-star-line");
+      toastr.info("Service removed from pinned list.");
+    } else {
+      // Add to pinned list
+      pinnedServices.push(id);
+      e.classList.remove("ri-star-line");
+      e.classList.add("ri-star-fill");
+      toastr.success("Service added to pinned list.");
+    }
+
+    localStorage.setItem("pinnedServices", JSON.stringify(pinnedServices));
+
+    // Reorder services dynamically
+    reorderServices();
+  }
+
+  // reorder services
+  function reorderServices() {
+    let pinnedServices =
+      JSON.parse(localStorage.getItem("pinnedServices")) || [];
+    let services = Array.from(servicesbox.children);
+
+    services.sort((a, b) => {
+      let idA = parseInt(
+        a.querySelector("i").getAttribute("onclick").match(/\d+/)[0]
+      );
+      let idB = parseInt(
+        b.querySelector("i").getAttribute("onclick").match(/\d+/)[0]
+      );
+
+      let isPinnedA = pinnedServices.includes(idA);
+      let isPinnedB = pinnedServices.includes(idB);
+
+      return isPinnedB - isPinnedA; // Move pinned items to top
+    });
+
+    // Re-append elements in the new order
+    servicesbox.innerHTML = "";
+    services.forEach((service) => servicesbox.appendChild(service));
+  }
+
+  // search system
+  document.getElementById("searchinput").addEventListener(
+    "input",
+    debounce(function () {
+      const searchTerm = this.value.toLowerCase();
+      const services = servicesbox.querySelectorAll("button");
+
+      services.forEach((service) => {
+        const serviceName = service
+          .querySelector("span")
+          .textContent.toLowerCase();
+        if (serviceName.includes(searchTerm)) {
+          service.style.display = "flex";
+        } else {
+          service.style.display = "none";
+        }
+      });
+    }, 300)
+  );
+
+  // Debounce function
+  function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+      const context = this;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  }
+
+  // reset server id
+  function resetpreselectedserver() {
+    loading.classList.remove("flex");
+    loading.classList.add("hidden");
+    servicesbox.classList.remove("hidden");
+    const server_data = JSON.parse(localStorage.getItem("server_key")) || {};
+    if (server_data) {
+      if (!server_data.defualt) {
+        localStorage.setItem(
+          "server_key",
+          JSON.stringify({
+            defualt: false,
+            server_id: null,
+          })
+        );
+      }
+    }
+  }
+
+  // create verification
+  const loading = document.getElementById("loading");
+  async function createverification(e) {
+    const service_id = e.getAttribute("data-id");
+    if (service_id) {
+      loading.classList.remove("hidden");
+      loading.classList.add("flex");
+      servicesbox.classList.add("hidden");
+
+      const url = "{{url_for('api.createverification')}}";
+      const server_data = JSON.parse(localStorage.getItem("server_key")) || {};
+      const server_id = server_data.server_id || null;
+      if (!server_id) {
+        toastr.error("Please select a server first. or reload the page.");
+        return;
+      }
+      const payoload = {
+        service_id: service_id,
+        server_id: server_id,
+      };
+      const data = await httpRequest(url, "POST", payoload);
+      if (data.status == "success") {
+        const main_data = data.data;
+        modelhandler("verification_model", null, resetpreselectedserver());
+        modelhandler("opt_model", loadveerifydata(data.data));
+        const html = `<tr data-vid="${main_data.service_token}" data-status="${
+          main_data.status
+        }" data-id="${
+          main_data.id
+        }" class="h-[60px] border-b duration-300 hover:bg-gray-50 border-gray-100">
+              <td>${main_data.service_name}</td>
+              <td>$${main_data.price}</td>
+              <td>${main_data.number}</td>
+              <td>None</td>
+              <td>#${main_data.server_id}</td>
+              <td>
+                <span
+                  class="font-bold ${
+                    main_data.status === "pending"
+                      ? "text-yellow-500 bg-yellow-50"
+                      : main_data.status === "complete"
+                      ? "text-green-500 bg-green-50"
+                      : "text-red-500 bg-red-50"
+                  } rounded-lg px-2 py-1 capitalize"
+                >
+                  ${main_data.status}
+                </span>
+              </td>
+              <td>
+                <div class="flex items-center gap-x-3">
+                  ${
+                    main_data.status === "pending"
+                      ? `
+                  <button
+                    data-id="${main_data.id}"
+                    onclick="openverify(this)"
+                    class="text-blue-500 ml-2 flex items-center gap-x-1"
+                  >
+                    <i class="ri-eye-line mb-1"></i>Open
+                  </button>
+                  <button
+                   data-id="${main_data.id}"
+                    onclick='cancelservice(this)'
+                    class="text-red-500 ml-2 flex items-center gap-x-1"
+                  >
+                    <i class="ri-delete-bin-line mb-1"></i>Cancel
+                  </button>`
+                      : "--"
+                  }
+                </div>
+              </td>
+            </tr>`;
+        verification_tale_body.insertAdjacentHTML("afterbegin", html);
+      } else {
+        toastr.error(data.message);
+        loading.classList.remove("flex");
+        loading.classList.add("hidden");
+        servicesbox.classList.remove("hidden");
+      }
+    } else {
+      toastr.error("Something went wrong! Please try again.");
+      loading.classList.remove("flex");
+      loading.classList.add("hidden");
+      servicesbox.classList.remove("hidden");
+    }
+  }
+
+  function hideverifymodel() {
+    modelhandler("verification_model", null, resetpreselectedserver());
+  }
+</script>
+{%endblock%}
